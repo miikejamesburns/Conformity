@@ -1,0 +1,25 @@
+# Conformity Default Configuration
+
+# Application Settings
+app_name: "Conformity"
+version: "0.1.0"
+log_level: "INFO"
+
+# Project Paths
+# These will be set dynamically if not specified
+project_root: null
+cache_dir: null
+temp_dir: null
+
+# OpenColorIO Settings
+ocio_config_path: null  # Set via OCIO environment variable or override here
+default_color_space: "linear"
+
+# OpenTimelineIO Settings
+default_fps: 24.0
+default_resolution: [1920, 1080]
+
+# UI Settings
+theme: "dark"
+window_width: 1280
+window_height: 720
