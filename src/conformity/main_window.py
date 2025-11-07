@@ -22,6 +22,7 @@ from .color_manager.color_pipeline import ColorPipeline
 from .asset_tracker.asset_manager import AssetManager
 from .ui_components.timeline_widget import TimelineWidget
 from .ui_components.asset_browser import AssetBrowserWidget
+from .ui_components.conform_panel import ConformPanel
 
 logger = get_logger(__name__)
 
@@ -198,6 +199,11 @@ class ConformityMainWindow(QMainWindow):
         # Create tab widget
         self._tab_widget = QTabWidget()
 
+        # Conform tab (import/export)
+        self._conform_panel = ConformPanel()
+        self._conform_panel.timeline_imported.connect(self._on_timeline_imported)
+        self._tab_widget.addTab(self._conform_panel, "Conform")
+
         # Timeline tab
         self._timeline_widget = TimelineWidget()
         self._tab_widget.addTab(self._timeline_widget, "Timeline")
@@ -327,6 +333,28 @@ class ConformityMainWindow(QMainWindow):
         </ul>
         """
         QMessageBox.about(self, "About Conformity", about_text)
+
+    def _on_timeline_imported(self, timeline, timeline_info):
+        """
+        Handle timeline imported from conform panel.
+
+        Args:
+            timeline: Imported OTIO timeline
+            timeline_info: Parsed timeline information
+        """
+        # Update timeline manager
+        self._timeline_manager.set_current_timeline(timeline)
+
+        # Update timeline widget
+        self._timeline_widget.set_timeline(timeline)
+
+        # Update status
+        self.statusBar().showMessage(
+            f"Imported timeline: {timeline.name} "
+            f"({timeline_info.num_clips} clips, {timeline_info.num_tracks} tracks)"
+        )
+
+        logger.info(f"Timeline imported via conform panel: {timeline.name}")
 
     def _update_color_info(self):
         """Update color management information display."""

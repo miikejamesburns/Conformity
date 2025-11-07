@@ -8,6 +8,11 @@ Conformity is a modular application designed to streamline post-production workf
 
 ### Key Features
 
+- **Automated Conform**: Import/export timelines from multiple formats (EDL, XML, AAF, FCPXML)
+  - Parse timeline structure with clips, tracks, transitions, and markers
+  - Validate timelines for errors and missing media
+  - Match clips to media files automatically
+  - Export to different formats with full metadata preservation
 - **Timeline Management**: Built on OpenTimelineIO (OTIO) for robust timeline operations
 - **Color Management**: Integrated OpenColorIO (OCIO) for professional color pipeline management
 - **Asset Tracking**: Comprehensive media asset management and organization
@@ -24,14 +29,17 @@ conformity/
 │   │   ├── config.py        # Configuration management
 │   │   └── logger.py        # Logging system
 │   ├── conform_engine/      # OTIO timeline operations
+│   │   ├── conform_engine.py    # Automated import/export
 │   │   ├── timeline_manager.py
-│   │   └── conform_ops.py
+│   │   ├── conform_ops.py
+│   │   └── exceptions.py
 │   ├── color_manager/       # OCIO color management
 │   │   ├── ocio_manager.py
 │   │   └── color_pipeline.py
 │   ├── asset_tracker/       # Asset management
 │   │   └── asset_manager.py
 │   └── ui_components/       # Qt UI widgets
+│       ├── conform_panel.py     # Conform operations UI
 │       ├── timeline_widget.py
 │       └── asset_browser.py
 ├── tests/                   # Unit tests
@@ -60,6 +68,13 @@ Provides foundational services used across the application:
 
 Handles all timeline and conform operations using OpenTimelineIO:
 
+- **conform_engine.py**: Automated timeline import/export
+  - Import from EDL, XML, AAF, FCPXML formats
+  - Parse timeline structure (clips, tracks, transitions, markers)
+  - Validate timelines for errors and missing media
+  - Export to multiple formats with metadata preservation
+  - Error handling with custom exceptions
+
 - **timeline_manager.py**: High-level timeline operations
   - Load/save timelines from various formats
   - Create new timelines
@@ -71,6 +86,11 @@ Handles all timeline and conform operations using OpenTimelineIO:
   - Relink media references
   - Generate conform reports
   - Extract clip metadata
+
+- **exceptions.py**: Custom exception classes
+  - ImportError, ExportError, MediaNotFoundError
+  - InvalidTimecodeError, UnsupportedFeatureError
+  - Detailed error reporting
 
 #### Color Manager (`src/conformity/color_manager/`)
 
@@ -102,6 +122,14 @@ Tracks and manages media assets:
 #### UI Components (`src/conformity/ui_components/`)
 
 Qt-based user interface widgets:
+
+- **conform_panel.py**: Automated conform operations UI
+  - Import timelines from multiple formats
+  - Display timeline structure in tree view
+  - Show detailed clip information
+  - Validate timelines for errors
+  - Export to different formats
+  - Interactive conform workflow
 
 - **timeline_widget.py**: Timeline visualization
   - Display timeline information
@@ -184,6 +212,38 @@ python run.py
 ```
 
 ## Usage Examples
+
+### Automated Conform Operations
+
+```python
+from pathlib import Path
+from conformity.conform_engine.conform_engine import ConformEngine, TimelineFormat
+
+# Create conform engine
+engine = ConformEngine()
+
+# Import timeline from XML
+timeline, info = engine.import_timeline(
+    Path("project.xml"),
+    verify_media=True
+)
+
+print(f"Imported: {info.num_clips} clips, {info.num_tracks} tracks")
+
+# Validate timeline
+results = engine.validate_timeline(timeline, check_media=True)
+if results['valid']:
+    print("Timeline is valid!")
+else:
+    print(f"Errors: {len(results['errors'])}")
+
+# Export to EDL
+engine.export_timeline(
+    timeline,
+    Path("output.edl"),
+    format=TimelineFormat.EDL
+)
+```
 
 ### Working with Timelines
 
