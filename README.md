@@ -94,19 +94,27 @@ Handles all timeline and conform operations using OpenTimelineIO:
 
 #### Color Manager (`src/conformity/color_manager/`)
 
-Manages color pipeline using OpenColorIO:
+Holistic color management system using OpenColorIO:
+
+- **color_manager.py**: Comprehensive color management engine
+  - Validate OCIO configurations
+  - Track color space assignments across pipeline
+  - Auto-detect color spaces from metadata and extensions
+  - Generate validation reports with status tracking
+  - Pipeline-wide color configuration management
 
 - **ocio_manager.py**: OCIO configuration and operations
-  - Load OCIO configs
+  - Load and validate OCIO configs
   - Query color spaces, displays, and views
   - Create color transformation processors
-  - Validate color spaces
+  - Validate color space compatibility
 
 - **color_pipeline.py**: Integration with timelines
-  - Assign color spaces to clips
-  - Auto-assign based on file types
-  - Generate color reports
+  - Assign color spaces to clips with validation
+  - Auto-assign based on file types and metadata
+  - Generate comprehensive color reports
   - Manage display/view assignments
+  - Track color space usage statistics
 
 #### Asset Tracker (`src/conformity/asset_tracker/`)
 
@@ -130,6 +138,15 @@ Qt-based user interface widgets:
   - Validate timelines for errors
   - Export to different formats
   - Interactive conform workflow
+
+- **color_space_widget.py**: Color management UI
+  - Load and validate OCIO configurations
+  - Set pipeline-wide color defaults
+  - Visualize color space families and relationships
+  - Analyze timelines for color space assignments
+  - Manually assign/override color spaces
+  - Auto-assign based on rules and metadata
+  - Export color space reports
 
 - **timeline_widget.py**: Timeline visualization
   - Display timeline information
@@ -267,27 +284,45 @@ print(f"Timeline: {info['name']}, Clips: {info['clips']}")
 manager.save_timeline(timeline, Path("output.otio"))
 ```
 
-### Managing Color
+### Holistic Color Management
 
 ```python
-from conformity.color_manager.ocio_manager import OCIOManager
+from pathlib import Path
+from conformity.color_manager.color_manager import ColorManager
 
-# Create OCIO manager
-ocio_mgr = OCIOManager()
+# Create color manager
+color_mgr = ColorManager()
 
-# Load a config
-ocio_mgr.load_config(Path("config.ocio"))
+# Load and validate OCIO config
+color_mgr.load_config(Path("config/ocio/simple_config.ocio"))
+valid, errors = color_mgr.validate_config()
+print(f"Config valid: {valid}")
 
-# List color spaces
-color_spaces = ocio_mgr.get_color_spaces()
-for cs in color_spaces:
-    print(cs)
-
-# Create a color transformation
-processor = ocio_mgr.create_processor(
-    src_color_space="linear",
-    dst_color_space="sRGB"
+# Set pipeline defaults
+pipeline = color_mgr.get_pipeline_config()
+pipeline.set_defaults(
+    working="Linear",
+    default_input="CameraRec709",
+    display="sRGB",
+    view="Standard"
 )
+
+# Add auto-detection rules
+pipeline.add_rule('.r3d', 'RedWideGamutRGB')
+pipeline.add_rule('.ari', 'ARRI_LogC4')
+pipeline.add_rule('.braw', 'BMDFilm_Gen5')
+
+# Auto-assign color spaces to timeline
+count = color_mgr.auto_assign_color_spaces(timeline, use_defaults=True)
+print(f"Assigned color spaces to {count} clips")
+
+# Analyze timeline
+result = color_mgr.analyze_timeline(timeline, auto_detect=True)
+print(f"Valid: {result.valid_count}, Missing: {result.missing_count}")
+
+# Generate report
+report = color_mgr.create_color_space_report(timeline)
+print(f"Color spaces used: {list(report['color_spaces_used'].keys())}")
 ```
 
 ### Tracking Assets

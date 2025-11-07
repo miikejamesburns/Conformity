@@ -1,0 +1,149 @@
+ocio_profile_version: 2
+
+description: Simple OCIO configuration for Conformity testing and demonstration
+
+search_path: ""
+strictparsing: true
+luma: [0.2126, 0.7152, 0.0722]
+
+roles:
+  default: Linear
+  scene_linear: Linear
+  rendering: Linear
+  compositing_log: LogC
+  color_timing: sRGB
+  data: Raw
+
+displays:
+  sRGB:
+    - !<View> {name: Standard, colorspace: sRGB}
+    - !<View> {name: Log, colorspace: LogC}
+    - !<View> {name: Raw, colorspace: Raw}
+
+active_displays: [sRGB]
+active_views: [Standard, Log, Raw]
+
+colorspaces:
+  - !<ColorSpace>
+    name: Linear
+    family: Linear
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      Scene-linear working space
+    isdata: false
+    allocation: lg2
+    allocationvars: [-15, 6]
+
+  - !<ColorSpace>
+    name: sRGB
+    family: Display
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      sRGB display color space
+    isdata: false
+    allocation: uniform
+    allocationvars: [-0.125, 1.125]
+    from_reference: !<GroupTransform>
+      children:
+        - !<ColorSpaceTransform> {src: Linear, dst: sRGB}
+
+  - !<ColorSpace>
+    name: Rec709
+    family: Display
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      Rec.709 video standard
+    isdata: false
+    allocation: uniform
+    allocationvars: [-0.125, 1.125]
+
+  - !<ColorSpace>
+    name: LogC
+    family: Log
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      ARRI LogC encoding
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+
+  - !<ColorSpace>
+    name: ACEScg
+    family: ACES
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      ACEScg working space
+    isdata: false
+    allocation: lg2
+    allocationvars: [-15, 6]
+
+  - !<ColorSpace>
+    name: ACES2065-1
+    family: ACES
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      ACES2065-1 interchange format
+    isdata: false
+    allocation: lg2
+    allocationvars: [-15, 6]
+
+  - !<ColorSpace>
+    name: RedWideGamutRGB
+    family: Input/RED
+    equalitygroup: ""
+    bitdepth: 16ui
+    description: |
+      RED Wide Gamut RGB color space
+    isdata: false
+    allocation: lg2
+    allocationvars: [-15, 6]
+
+  - !<ColorSpace>
+    name: ARRI_LogC4
+    family: Input/ARRI
+    equalitygroup: ""
+    bitdepth: 16ui
+    description: |
+      ARRI LogC4 color space
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+
+  - !<ColorSpace>
+    name: BMDFilm_Gen5
+    family: Input/Blackmagic
+    equalitygroup: ""
+    bitdepth: 12ui
+    description: |
+      Blackmagic Film Gen 5
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+
+  - !<ColorSpace>
+    name: CameraRec709
+    family: Input/Generic
+    equalitygroup: ""
+    bitdepth: 8ui
+    description: |
+      Generic camera Rec.709
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+
+  - !<ColorSpace>
+    name: Raw
+    family: Utility
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      Raw data (no color transform)
+    isdata: true
+    allocation: uniform
+    allocationvars: [0, 1]

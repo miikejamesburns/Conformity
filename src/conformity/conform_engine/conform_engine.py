@@ -59,6 +59,10 @@ class ClipInfo:
     markers: List[Dict[str, Any]] = field(default_factory=list)
     timecode_in: Optional[str] = None
     timecode_out: Optional[str] = None
+    # Color space information
+    input_color_space: Optional[str] = None
+    working_color_space: Optional[str] = None
+    color_space_warnings: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -75,6 +79,10 @@ class TimelineInfo:
     metadata: Dict[str, Any] = field(default_factory=dict)
     unsupported_features: List[str] = field(default_factory=list)
     missing_media: List[str] = field(default_factory=list)
+    # Color space tracking
+    clips_with_color_space: int = 0
+    clips_without_color_space: int = 0
+    color_spaces_used: Dict[str, int] = field(default_factory=dict)
 
 
 class ConformEngine:
@@ -236,6 +244,14 @@ class ConformEngine:
                 info.clips.append(clip_info)
                 info.num_clips += 1
 
+                # Track color space statistics
+                if clip_info.input_color_space:
+                    info.clips_with_color_space += 1
+                    cs = clip_info.input_color_space
+                    info.color_spaces_used[cs] = info.color_spaces_used.get(cs, 0) + 1
+                else:
+                    info.clips_without_color_space += 1
+
             elif isinstance(item, otio.schema.Transition):
                 info.num_transitions += 1
 
@@ -309,6 +325,18 @@ class ConformEngine:
                     'metadata': dict(marker.metadata)
                 }
                 clip_info.markers.append(marker_data)
+
+        # Extract color space information
+        if "color" in clip.metadata:
+            color_meta = clip.metadata["color"]
+            clip_info.input_color_space = color_meta.get("input_color_space")
+            clip_info.working_color_space = color_meta.get("working_color_space")
+
+            # Log if found
+            if clip_info.input_color_space:
+                logger.debug(f"Clip '{clip.name}' has color space: {clip_info.input_color_space}")
+            else:
+                clip_info.color_space_warnings.append("No input color space defined")
 
         # Calculate timecodes if possible
         if clip_info.source_range:

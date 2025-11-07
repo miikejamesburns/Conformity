@@ -23,6 +23,7 @@ from .asset_tracker.asset_manager import AssetManager
 from .ui_components.timeline_widget import TimelineWidget
 from .ui_components.asset_browser import AssetBrowserWidget
 from .ui_components.conform_panel import ConformPanel
+from .ui_components.color_space_widget import ColorSpaceWidget
 
 logger = get_logger(__name__)
 
@@ -213,13 +214,9 @@ class ConformityMainWindow(QMainWindow):
         self._tab_widget.addTab(self._asset_browser, "Assets")
 
         # Color Management tab
-        color_widget = QWidget()
-        color_layout = QVBoxLayout(color_widget)
-        self._color_info_label = QLabel("No OCIO config loaded")
-        self._color_info_label.setWordWrap(True)
-        color_layout.addWidget(self._color_info_label)
-        color_layout.addStretch()
-        self._tab_widget.addTab(color_widget, "Color Management")
+        self._color_space_widget = ColorSpaceWidget()
+        self._color_space_widget.color_space_changed.connect(self._on_color_space_changed)
+        self._tab_widget.addTab(self._color_space_widget, "Color Management")
 
         layout.addWidget(self._tab_widget)
 
@@ -348,6 +345,9 @@ class ConformityMainWindow(QMainWindow):
         # Update timeline widget
         self._timeline_widget.set_timeline(timeline)
 
+        # Update color space widget
+        self._color_space_widget.set_timeline(timeline)
+
         # Update status
         self.statusBar().showMessage(
             f"Imported timeline: {timeline.name} "
@@ -356,16 +356,15 @@ class ConformityMainWindow(QMainWindow):
 
         logger.info(f"Timeline imported via conform panel: {timeline.name}")
 
-    def _update_color_info(self):
-        """Update color management information display."""
-        config = self._ocio_manager.get_config()
-        if config:
-            info = [
-                f"<b>OCIO Configuration</b>",
-                f"<b>Description:</b> {config.getDescription()}",
-                f"<b>Color Spaces:</b> {len(self._ocio_manager.get_color_spaces())}",
-                f"<b>Displays:</b> {len(self._ocio_manager.get_displays())}",
-            ]
-            self._color_info_label.setText("<br>".join(info))
-        else:
-            self._color_info_label.setText("No OCIO config loaded")
+    def _on_color_space_changed(self, clip_name: str, color_space: str):
+        """
+        Handle color space assignment change.
+
+        Args:
+            clip_name: Name of the clip
+            color_space: Assigned color space
+        """
+        self.statusBar().showMessage(
+            f"Color space assigned: {clip_name} -> {color_space}"
+        )
+        logger.info(f"Color space changed: {clip_name} -> {color_space}")
