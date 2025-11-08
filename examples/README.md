@@ -57,7 +57,36 @@ python examples/media_review_example.py
 - PyQt6 installed
 - Display environment (not headless)
 
-### 3. Integrated Workflow Example (`integrated_workflow_example.py`)
+### 3. tlRender Professional Playback Example (`tlrender_example.py`)
+
+Demonstrates professional-grade video playback with tlRender:
+
+- High-performance timeline playback
+- Professional format support (EXR, DPX, ProRes, RAW)
+- OCIO color management integration
+- Hardware-accelerated rendering
+- Frame-accurate navigation
+- Image sequence handling
+
+**Run:**
+```bash
+python examples/tlrender_example.py
+```
+
+**Key concepts covered:**
+- tlRender engine API
+- Timeline playback
+- Image sequence playback
+- OCIO integration
+- GUI widget usage
+- Performance optimization
+- Format support
+
+**Note:** This example requires tlRender to be installed.
+- Installation guide: [docs/TLRENDER.md](../docs/TLRENDER.md)
+- Repository: https://github.com/darbyjohnston/tlRender
+
+### 4. Integrated Workflow Example (`integrated_workflow_example.py`)
 
 Demonstrates complete real-world scenarios combining multiple systems:
 
@@ -204,7 +233,12 @@ We recommend exploring the examples in this order:
    python examples/media_review_example.py
    ```
 
-3. **Study Integrated Workflows** - See how everything works together
+3. **tlRender Professional Playback** - Advanced playback for professional formats
+   ```bash
+   python examples/tlrender_example.py
+   ```
+
+4. **Study Integrated Workflows** - See how everything works together
    ```bash
    python examples/integrated_workflow_example.py
    ```

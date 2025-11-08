@@ -15,6 +15,11 @@ Conformity is a modular application designed to streamline post-production workf
   - Export to different formats with full metadata preservation
 - **Timeline Management**: Built on OpenTimelineIO (OTIO) for robust timeline operations
 - **Color Management**: Integrated OpenColorIO (OCIO) for professional color pipeline management
+- **Professional Playback**: tlRender integration for high-performance video playback
+  - Hardware-accelerated rendering
+  - Professional format support (EXR, DPX, ProRes, RED, ARRI)
+  - Frame-accurate scrubbing
+  - Image sequence handling
 - **Asset Tracking**: Comprehensive media asset management and organization
 - **Modern UI**: Clean, intuitive interface built with PyQt6
 
@@ -805,6 +810,9 @@ python examples/media_review_example.py
 
 # Integrated workflow examples
 python examples/integrated_workflow_example.py
+
+# tlRender professional playback examples
+python examples/tlrender_example.py
 ```
 
 Each example includes:
