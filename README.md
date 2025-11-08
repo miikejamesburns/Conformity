@@ -203,14 +203,45 @@ Holistic color management system using OpenColorIO:
 
 #### Asset Tracker (`src/conformity/asset_tracker/`)
 
-Tracks and manages media assets:
+Comprehensive asset tracking system with SQLite backend:
 
-- **asset_manager.py**: Asset registration and management
-  - Register assets with metadata
-  - Scan directories for media
-  - Verify asset availability
-  - Track asset status (online/offline)
-  - Generate statistics
+- **asset_database.py**: SQLite database manager
+  - Asset metadata storage (paths, types, technical specs)
+  - Timeline associations (clip-to-file relationships)
+  - Version history and dependencies
+  - Color space information tracking
+  - Status workflow management (pending, approved, needs_review)
+  - Tag-based organization
+  - Search and filtering with indices
+
+- **metadata_extractor.py**: Technical metadata extraction
+  - Extract from video files using ffprobe
+  - Image metadata with PIL
+  - Audio file metadata
+  - Automatic codec, resolution, frame rate detection
+  - Color space information extraction
+  - File checksum calculation (MD5/SHA256)
+
+- **asset_scanner.py**: Directory scanning and verification
+  - Recursive media file discovery
+  - Automatic metadata extraction and storage
+  - Asset verification (online/offline status)
+  - Batch operations (status update, tag addition)
+  - Progress callback support for UI integration
+  - Asset relocation tracking
+
+- **timeline_analyzer.py**: Timeline-to-asset relationship tracking
+  - Analyze OTIO timelines for media references
+  - Create clip-to-asset associations
+  - Find missing media
+  - Automatic media relinking
+  - Usage reports (most used, unused assets)
+  - Timeline asset queries
+
+- **asset_manager.py**: Legacy asset management
+  - Basic asset registration
+  - Directory scanning
+  - Status tracking
 
 #### UI Components (`src/conformity/ui_components/`)
 
@@ -238,7 +269,17 @@ Qt-based user interface widgets:
   - Browse tracks and clips
   - Show duration and metadata
 
-- **asset_browser.py**: Asset management UI
+- **asset_tracker_widget.py**: Advanced asset tracking UI
+  - Text search across file paths and metadata
+  - Filter by type, status, color space
+  - Sortable table with multi-select
+  - Batch status updates
+  - Directory scanning with progress bar
+  - Asset verification (online/offline check)
+  - Double-click for detailed asset information
+  - Real-time statistics display
+
+- **asset_browser.py**: Legacy asset management UI
   - Browse registered assets
   - Scan directories
   - Verify asset status
@@ -609,6 +650,62 @@ count = consolidate_gaps(track)
 count = fill_gaps_with_black(track)
 ```
 
+### Asset Tracking
+
+```python
+from pathlib import Path
+from conformity.asset_tracker.asset_database import AssetDatabase, AssetType, AssetStatus
+from conformity.asset_tracker.asset_scanner import AssetScanner
+from conformity.asset_tracker.timeline_analyzer import TimelineAnalyzer
+import opentimelineio as otio
+
+# Create database
+db_path = Path("project.db")
+db = AssetDatabase(db_path)
+
+# Create scanner
+scanner = AssetScanner(db)
+
+# Scan directory for media files
+results = scanner.scan_directory(
+    Path("/media/footage"),
+    recursive=True
+)
+
+print(f"Added {results['added']} assets")
+
+# Search for assets
+assets = db.search_assets(
+    asset_type=AssetType.VIDEO,
+    status=AssetStatus.APPROVED
+)
+
+for asset in assets:
+    print(f"{asset['file_name']}: {asset['status']}")
+
+# Analyze timeline
+timeline = otio.adapters.read_from_file("timeline.otio")
+analyzer = TimelineAnalyzer(db)
+
+results = analyzer.analyze_timeline(timeline)
+print(f"Linked clips: {results['linked_clips']}")
+print(f"Missing clips: {results['missing_clips']}")
+
+# Verify assets are online
+verify_results = scanner.verify_assets()
+print(f"Online: {verify_results['online']}, Offline: {verify_results['offline']}")
+
+# Batch update status
+selected_ids = [1, 2, 3]
+count = scanner.batch_update_status(selected_ids, AssetStatus.APPROVED)
+print(f"Updated {count} assets")
+
+# Generate usage report
+report = analyzer.generate_usage_report()
+print(f"Total associations: {report['total_associations']}")
+print(f"Unused assets: {report['unused_assets']}")
+```
+
 ## Development
 
 ### Running Tests
@@ -734,7 +831,28 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.4.0 (Current)
+### 0.5.0 (Current)
+- **Asset Tracking System**
+  - SQLite database backend for persistent storage
+  - Asset metadata storage (paths, types, technical specs)
+  - Timeline associations (clip-to-file relationships)
+  - Metadata extraction from video/image/audio files using ffprobe/PIL
+  - Automatic codec, resolution, frame rate detection
+  - Color space information extraction
+  - File checksum calculation (MD5/SHA256)
+  - Recursive directory scanning with progress tracking
+  - Asset verification (online/offline status)
+  - Batch operations (status update, tag addition, relocation)
+  - Timeline analyzer for media references
+  - Automatic media relinking
+  - Usage reports (most used, unused assets)
+  - Qt search/filter UI with sortable table
+  - Text search across metadata
+  - Filter by type, status, color space
+  - Comprehensive test suite (20+ tests passing)
+  - Full documentation in docs/ASSET_TRACKING.md with schema and examples
+
+### 0.4.0
 - **Advanced Timeline Editing Tools**
   - Professional editing modes: Ripple, Roll, Slip, Slide
   - Full undo/redo support with operation history
