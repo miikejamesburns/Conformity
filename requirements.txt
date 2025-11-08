@@ -24,6 +24,7 @@ pathlib>=1.0.1
 pytest>=7.4.0
 pytest-qt>=4.2.0
 pytest-cov>=4.1.0
+pytest-xdist>=3.5.0  # Parallel test execution
 black>=23.12.0
 flake8>=7.0.0
 mypy>=1.8.0
