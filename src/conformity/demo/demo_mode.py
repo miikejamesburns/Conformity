@@ -140,7 +140,7 @@ class DemoProject:
                 'camera': 'B',
                 'lens': 'Cooke S4 40mm',
                 'duration': 120,
-                'status': AssetStatus.REVIEW
+                'status': AssetStatus.NEEDS_REVIEW
             },
             {
                 'name': 'A003_C001.mov',
@@ -201,7 +201,7 @@ class DemoProject:
             asset_id = self.asset_db.add_asset(
                 file_path=render_file,
                 asset_type=AssetType.IMAGE,
-                status=AssetStatus.APPROVED if render['complexity'] == 'simple' else AssetStatus.REVIEW
+                status=AssetStatus.APPROVED if render['complexity'] == 'simple' else AssetStatus.NEEDS_REVIEW
             )
 
             self.asset_db.add_metadata(asset_id, {
