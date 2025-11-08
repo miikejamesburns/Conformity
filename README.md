@@ -956,7 +956,27 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.7.0 (Current)
+### 0.8.0 (Current)
+- **Natural Language Command Interface**
+  - Pattern-based natural language query parser
+  - Command types: find, show, list, count, filter
+  - Multiple filter types: keyword, color space, status, type, codec, resolution, frame rate, tags
+  - Autocomplete suggestions with live preview
+  - Command history with search and statistics
+  - Saved queries with categories and import/export
+  - Qt GUI widget with table and text result views
+  - Built-in help system with examples
+  - LLM-ready architecture with clear separation of concerns
+  - Structured command representation (ParsedCommand)
+  - Stateless executor for any command source
+  - Command registry for documentation and LLM context
+  - Keyboard shortcuts for history navigation
+  - Confidence scoring for parse quality
+  - Extensible design for adding commands and filters
+  - Comprehensive documentation in docs/COMMAND_INTERFACE.md
+  - Example queries: "find clips with shot_010", "show assets in rec709", "list missing media"
+
+### 0.7.0
 - **Professional Playback with tlRender**
   - High-performance playback engine using tlRender
   - Professional format support (EXR, DPX, ProRes, RED, ARRI, Blackmagic RAW)
