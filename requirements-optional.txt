@@ -1,0 +1,90 @@
+# Optional Dependencies for Conformity
+
+# These dependencies are optional and may require building from source.
+# The core Conformity functionality works without them.
+
+# ============================================================
+# Color Management (Optional)
+# ============================================================
+
+# PyOpenColorIO>=2.3.0
+#
+# NOTE: PyOpenColorIO often doesn't have pre-built wheels for all platforms,
+# especially Apple Silicon (ARM64) Macs.
+#
+# Installation Options:
+#
+# Option 1: Build from source (recommended)
+# ----------------------------------------
+# brew install opencolorio  # macOS with Homebrew
+# pip install PyOpenColorIO
+#
+# Or on Linux:
+# sudo apt-get install libopencolorio-dev  # Ubuntu/Debian
+# pip install PyOpenColorIO
+#
+# Option 2: Use conda
+# -------------------
+# conda install -c conda-forge opencolorio
+#
+# Option 3: Skip color management
+# -------------------------------
+# Conformity will work without PyOpenColorIO, but color management
+# features will be disabled. The system will gracefully handle the
+# missing dependency.
+#
+# To verify installation:
+# python -c "import PyOpenColorIO as ocio; print(f'OCIO version: {ocio.__version__}')"
+
+# ============================================================
+# Professional Playback (Optional)
+# ============================================================
+
+# tlRender
+#
+# NOTE: tlRender currently requires building from source.
+# See docs/TLRENDER.md for detailed installation instructions.
+#
+# Repository: https://github.com/darbyjohnston/tlRender
+#
+# tlRender provides professional-grade video playback with:
+# - Hardware-accelerated rendering (OpenGL/Vulkan)
+# - Support for professional formats (EXR, DPX, ProRes, RED, ARRI)
+# - OCIO color management integration
+# - Frame-accurate navigation
+#
+# Installation:
+# 1. Clone repository: git clone https://github.com/darbyjohnston/tlRender
+# 2. Follow build instructions in repository
+# 3. Python bindings will be available when built
+
+# ============================================================
+# Machine Learning (Future - Phase 2)
+# ============================================================
+
+# fiftyone
+#
+# NOTE: Not yet integrated. Planned for Phase 2.
+# Will provide ML-powered media analysis and quality assessment.
+#
+# Installation when ready:
+# pip install fiftyone
+
+# ============================================================
+# Additional Testing Tools (Optional)
+# ============================================================
+
+# pytest-benchmark>=4.0.0
+# pytest-timeout>=2.1.0
+# pytest-mock>=3.12.0
+
+# ============================================================
+# Code Quality Tools (Optional)
+# ============================================================
+
+# These are already in requirements.txt but repeated here for reference:
+# black>=23.12.0
+# flake8>=7.0.0
+# mypy>=1.8.0
+# isort>=5.13.0
+# pylint>=3.0.0

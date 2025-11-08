@@ -1,6 +1,10 @@
-# Core Timeline and Color Management
+# Core Timeline Management
 opentimelineio>=0.16.0
-PyOpenColorIO>=2.3.0
+
+# Optional: Color Management
+# PyOpenColorIO>=2.3.0
+# Note: PyOpenColorIO often requires building from source
+# See requirements-optional.txt for installation instructions
 
 # UI Framework
 PyQt6>=6.6.0
