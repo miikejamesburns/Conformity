@@ -32,14 +32,25 @@ conformity/
 │   │   ├── conform_engine.py    # Automated import/export
 │   │   ├── timeline_manager.py
 │   │   ├── conform_ops.py
+│   │   ├── edl_utils.py     # EDL/CMX 3600 support
 │   │   └── exceptions.py
+│   ├── timeline_editor/     # Advanced editing tools
+│   │   ├── edit_operations.py   # Ripple/Roll/Slip/Slide
+│   │   ├── clip_operations.py   # Split/Trim/Copy/Paste
+│   │   ├── track_operations.py  # Track management
+│   │   └── gap_utils.py         # Gap management
+│   ├── lut_manager/         # LUT management
+│   │   ├── lut_loader.py    # CUBE/3DL parsing
+│   │   └── lut_manager.py   # Library management
 │   ├── color_manager/       # OCIO color management
+│   │   ├── color_manager.py     # Holistic color engine
 │   │   ├── ocio_manager.py
 │   │   └── color_pipeline.py
 │   ├── asset_tracker/       # Asset management
 │   │   └── asset_manager.py
 │   └── ui_components/       # Qt UI widgets
-│       ├── conform_panel.py     # Conform operations UI
+│       ├── conform_panel.py      # Conform operations UI
+│       ├── color_space_widget.py # Color management UI
 │       ├── timeline_widget.py
 │       └── asset_browser.py
 ├── tests/                   # Unit tests
@@ -101,6 +112,70 @@ Handles all timeline and conform operations using OpenTimelineIO:
   - ImportError, ExportError, MediaNotFoundError
   - InvalidTimecodeError, UnsupportedFeatureError
   - Detailed error reporting
+
+#### Timeline Editor (`src/conformity/timeline_editor/`)
+
+Advanced timeline editing operations with professional NLE functionality:
+
+- **edit_operations.py**: Professional editing modes with undo/redo
+  - TimelineEditor: Central editing controller with history management
+  - Ripple Edit: Change clip duration and shift following clips
+  - Roll Edit: Adjust edit points between clips
+  - Slip Edit: Change source content without moving timeline position
+  - Slide Edit: Move clip position while maintaining duration
+  - Full undo/redo support with operation history
+
+- **clip_operations.py**: Clip-level editing tools
+  - Split: Cut clip at specified time
+  - Trim: Adjust in/out points
+  - Copy/Paste: Clipboard operations
+  - Duplicate: Create multiple copies
+  - Delete: Remove with optional gap closing
+  - Replace: Swap clips with duration matching
+  - Move: Transfer clips between tracks
+  - Speed Control: Adjust playback speed (slow/fast motion)
+  - Reverse: Flip playback direction
+
+- **track_operations.py**: Track management operations
+  - Add/Remove: Manage tracks with auto-naming
+  - Reorder: Change track stacking order
+  - Duplicate: Copy entire tracks with contents
+  - Merge: Combine multiple tracks
+  - Lock/Unlock: Prevent accidental edits
+  - Mute/Solo: Audio/video track control
+  - Rename: Update track names
+  - Filter: Get video or audio tracks
+
+- **gap_utils.py**: Gap management utilities
+  - Find: Locate all gaps in tracks
+  - Remove: Delete gaps with optional duration filter
+  - Insert: Add gaps at specific positions
+  - Close: Remove specific gaps with ripple option
+  - Consolidate: Merge adjacent gaps
+  - Fill: Replace gaps with black/silence clips
+  - Split: Divide gaps into multiple sections
+  - Query: Check gap existence and total duration
+
+#### LUT Manager (`src/conformity/lut_manager/`)
+
+Comprehensive LUT (Look-Up Table) management system:
+
+- **lut_loader.py**: LUT loading and application
+  - Parse CUBE and 3DL format LUTs
+  - 1D LUT support with linear interpolation
+  - 3D LUT support with trilinear interpolation
+  - Apply LUTs to RGB arrays
+  - Identity LUT creation
+  - Format validation and error handling
+
+- **lut_manager.py**: LUT library management
+  - Library organization with categories
+  - Metadata tracking (usage count, tags, descriptions)
+  - Search and filtering by name, category, tags
+  - Favorite LUT management
+  - Apply LUTs to clips and timelines
+  - Batch LUT operations
+  - Export usage reports
 
 #### Color Manager (`src/conformity/color_manager/`)
 
@@ -390,6 +465,150 @@ status = asset_mgr.verify_assets()
 print(f"Online: {status['online']}, Offline: {status['offline']}")
 ```
 
+### Advanced Timeline Editing
+
+```python
+from conformity.timeline_editor import TimelineEditor
+import opentimelineio as otio
+
+# Load timeline
+timeline = otio.adapters.read_from_file("timeline.otio")
+
+# Create editor with undo/redo support
+editor = TimelineEditor(timeline)
+
+track = timeline.tracks[0]
+clip = track[0]
+
+# Ripple edit - change duration and shift following clips
+new_duration = otio.opentime.RationalTime(96, 24)  # 4 seconds at 24fps
+editor.ripple_edit(track, clip, new_duration, ripple_following=True)
+
+# Undo if needed
+if editor.can_undo():
+    editor.undo()
+
+# Roll edit - adjust edit point between two clips
+delta = otio.opentime.RationalTime(12, 24)  # Shift 12 frames
+editor.roll_edit(track, clip, track[1], delta)
+
+# Slip edit - change source content without moving timeline position
+offset = otio.opentime.RationalTime(24, 24)
+editor.slip_edit(track, clip, offset)
+
+# Slide edit - move clip along timeline
+editor.slide_edit(track, clip, offset)
+```
+
+### Clip Operations
+
+```python
+from conformity.timeline_editor import (
+    split_clip, trim_clip, copy_clip, paste_clip,
+    duplicate_clip, delete_clip
+)
+
+# Split clip at 2 seconds
+split_time = otio.opentime.RationalTime(48, 24)
+result = split_clip(track, clip, split_time)
+if result:
+    first_clip, second_clip = result
+    print(f"Split into '{first_clip.name}' and '{second_clip.name}'")
+
+# Trim clip in/out points
+new_in = otio.opentime.RationalTime(10, 24)
+new_out = otio.opentime.RationalTime(110, 24)
+trim_clip(clip, new_in=new_in, new_out=new_out)
+
+# Copy and paste
+clip_copy = copy_clip(clip)
+paste_clip(destination_track, clip_copy, index=5)
+
+# Duplicate clip 3 times
+duplicates = duplicate_clip(track, clip, count=3)
+
+# Delete with gap closing (ripple delete)
+delete_clip(track, clip, close_gap=True)
+
+# Speed control
+from conformity.timeline_editor.clip_operations import set_clip_speed, reverse_clip
+
+set_clip_speed(clip, speed=2.0)  # Double speed
+reverse_clip(clip)  # Reverse playback
+```
+
+### Track Management
+
+```python
+from conformity.timeline_editor import (
+    add_track, remove_track, reorder_tracks
+)
+from conformity.timeline_editor.track_operations import (
+    merge_tracks, lock_track, solo_track
+)
+
+# Add video track
+video_track = add_track(
+    timeline,
+    name="V2",
+    kind=otio.schema.TrackKind.Video
+)
+
+# Add audio track (auto-named)
+audio_track = add_track(
+    timeline,
+    kind=otio.schema.TrackKind.Audio
+)
+
+# Reorder tracks
+reorder_tracks(timeline, video_track, new_index=0)
+
+# Merge multiple tracks
+merged = merge_tracks(
+    timeline,
+    tracks=[track1, track2, track3],
+    name="Merged Track",
+    remove_source=True
+)
+
+# Lock track to prevent editing
+lock_track(track, locked=True)
+
+# Solo track (mutes all others of same kind)
+solo_track(timeline, track, solo=True)
+```
+
+### Gap Management
+
+```python
+from conformity.timeline_editor import find_gaps, remove_gaps, insert_gap
+from conformity.timeline_editor.gap_utils import (
+    consolidate_gaps, fill_gaps_with_black
+)
+
+# Find all gaps in track
+gaps = find_gaps(track)
+for index, gap in gaps:
+    print(f"Gap at index {index}: duration {gap.duration()}")
+
+# Remove all gaps
+count = remove_gaps(track)
+
+# Remove only long gaps (> 1 second)
+min_duration = otio.opentime.RationalTime(24, 24)
+count = remove_gaps(track, min_duration=min_duration)
+
+# Insert 1-second gap at position 5
+gap_duration = otio.opentime.RationalTime(24, 24)
+insert_gap(track, index=5, duration=gap_duration)
+
+# Consolidate adjacent gaps
+count = consolidate_gaps(track)
+
+# Fill gaps with black/silence clips
+count = fill_gaps_with_black(track)
+```
+
 ## Development
 
 ### Running Tests
@@ -478,7 +697,7 @@ Conformity/
 Future enhancements planned:
 
 - [x] **EDL import/export support** - Complete CMX 3600 support with parsing, writing, validation
-- [ ] Advanced timeline editing tools
+- [x] **Advanced timeline editing tools** - Professional editing operations with undo/redo support
 - [x] **LUT application and management** - Full LUT loading, library management, and timeline integration
 - [ ] Render queue management
 - [ ] Multi-project workspace
@@ -515,7 +734,22 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.3.0 (Current)
+### 0.4.0 (Current)
+- **Advanced Timeline Editing Tools**
+  - Professional editing modes: Ripple, Roll, Slip, Slide
+  - Full undo/redo support with operation history
+  - Clip operations: split, trim, copy, paste, duplicate, delete
+  - Replace clips with duration matching
+  - Move clips between tracks
+  - Speed control (slow/fast motion) and reverse playback
+  - Track management: add, remove, reorder, duplicate, merge
+  - Lock/unlock and mute/solo track controls
+  - Gap management: find, remove, insert, consolidate, fill
+  - Comprehensive test suite (21/21 tests passing)
+  - Full documentation in docs/TIMELINE_EDITING.md
+  - API reference with examples and workflow patterns
+
+### 0.3.0
 - **LUT Management System**
   - LUT loading and parsing (.cube, .3dl formats)
   - 1D and 3D LUT support with trilinear interpolation
