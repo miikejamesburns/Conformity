@@ -20,6 +20,11 @@ Conformity is a modular application designed to streamline post-production workf
   - Professional format support (EXR, DPX, ProRes, RED, ARRI)
   - Frame-accurate scrubbing
   - Image sequence handling
+- **Natural Language Commands**: Query interface for intuitive project navigation
+  - Pattern-based query parsing ("find clips with shot_010")
+  - Command history and saved queries
+  - Autocomplete suggestions
+  - LLM-ready architecture for future AI integration
 - **Asset Tracking**: Comprehensive media asset management and organization
 - **Modern UI**: Clean, intuitive interface built with PyQt6
 
@@ -813,6 +818,9 @@ python examples/integrated_workflow_example.py
 
 # tlRender professional playback examples
 python examples/tlrender_example.py
+
+# Natural language command interface examples
+python examples/command_interface_example.py
 ```
 
 Each example includes:

@@ -86,7 +86,38 @@ python examples/tlrender_example.py
 - Installation guide: [docs/TLRENDER.md](../docs/TLRENDER.md)
 - Repository: https://github.com/darbyjohnston/tlRender
 
-### 4. Integrated Workflow Example (`integrated_workflow_example.py`)
+### 4. Natural Language Command Interface Example (`command_interface_example.py`)
+
+Demonstrates the natural language query system:
+
+- Pattern-based command parsing
+- Command execution against asset database
+- Autocomplete suggestions
+- Command history management
+- Saved queries system
+- Qt GUI interface
+- LLM-ready architecture
+
+**Run:**
+```bash
+python examples/command_interface_example.py
+```
+
+**Key concepts covered:**
+- Natural language query parsing
+- Structured command representation
+- Command execution and results
+- History and saved queries
+- Autocomplete system
+- Future LLM integration patterns
+
+**Example queries:**
+- "find clips with shot_010"
+- "show assets in rec709 color space"
+- "list missing media"
+- "filter by approved status"
+
+### 5. Integrated Workflow Example (`integrated_workflow_example.py`)
 
 Demonstrates complete real-world scenarios combining multiple systems:
 
@@ -238,7 +269,12 @@ We recommend exploring the examples in this order:
    python examples/tlrender_example.py
    ```
 
-4. **Study Integrated Workflows** - See how everything works together
+4. **Natural Language Commands** - Intuitive query system
+   ```bash
+   python examples/command_interface_example.py
+   ```
+
+5. **Study Integrated Workflows** - See how everything works together
    ```bash
    python examples/integrated_workflow_example.py
    ```
