@@ -80,31 +80,87 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 
-#### 3. Install Dependencies
+#### 3. Install PyOpenColorIO (Required)
 
+**Important:** PyOpenColorIO is a **required** dependency for Conformity's color management pipeline. It often requires building from source on some platforms.
+
+##### macOS (with Homebrew)
 ```bash
-# Install core dependencies
-pip install -r requirements.txt
+# Install OpenColorIO library first
+brew install opencolorio
 
-# Note: PyOpenColorIO is optional and may fail to install on some platforms
-# See docs/INSTALLATION_TROUBLESHOOTING.md if you encounter errors
-
-# Verify installation
-python -c "import conformity; print('Installation successful!')"
+# Then install Python bindings
+pip install PyOpenColorIO
 ```
 
-**Troubleshooting:** If you see errors about PyOpenColorIO:
-- This is **normal** on Apple Silicon Macs and some platforms
-- PyOpenColorIO is **optional** - core features work without it
-- See [Installation Troubleshooting](docs/INSTALLATION_TROUBLESHOOTING.md) for solutions
-- Quick fix: Continue without color management (it's optional!)
+##### macOS (Apple Silicon - if Homebrew fails)
+```bash
+# Install build tools
+brew install cmake ninja
+
+# Clone OpenColorIO
+git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
+cd OpenColorIO
+
+# Build with Python bindings
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release \
+      -DOCIO_BUILD_PYTHON=ON \
+      -DPython_EXECUTABLE=$(which python3) \
+      ..
+
+make -j8
+sudo make install
+cd ../..
+```
+
+##### Linux (Ubuntu/Debian)
+```bash
+# Install OpenColorIO library
+sudo apt-get update
+sudo apt-get install libopencolorio-dev python3-opencolorio
+
+# Or build from source
+sudo apt-get install cmake ninja-build
+git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
+cd OpenColorIO
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DOCIO_BUILD_PYTHON=ON ..
+make -j$(nproc)
+sudo make install
+cd ../..
+```
+
+##### Windows
+```powershell
+# Install Visual Studio Build Tools first
+# Then use vcpkg or build from source
+
+# Using vcpkg
+vcpkg install opencolorio
+
+# Set environment variables and install
+pip install PyOpenColorIO
+```
+
+##### Verify PyOpenColorIO Installation
+```bash
+python -c "import PyOpenColorIO as ocio; print(f'OCIO version: {ocio.__version__}')"
+```
+
+#### 4. Install Remaining Dependencies
 
 ```bash
-# If installation fails, try the automated setup script:
+# Install all other dependencies
+pip install -r requirements.txt
+
+# Or use the automated setup script:
 python setup_conformity.py --install
 ```
 
-#### 4. Verify Installation
+**Need Help?** See [Installation Troubleshooting](docs/INSTALLATION_TROUBLESHOOTING.md) for detailed platform-specific instructions and common issues.
+
+#### 5. Verify Installation
 
 ```bash
 # Run tests to verify everything works
