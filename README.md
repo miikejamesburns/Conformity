@@ -479,7 +479,7 @@ Future enhancements planned:
 
 - [x] **EDL import/export support** - Complete CMX 3600 support with parsing, writing, validation
 - [ ] Advanced timeline editing tools
-- [ ] LUT application and management
+- [x] **LUT application and management** - Full LUT loading, library management, and timeline integration
 - [ ] Render queue management
 - [ ] Multi-project workspace
 - [ ] Plugin architecture
@@ -515,7 +515,20 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.2.0 (Current)
+### 0.3.0 (Current)
+- **LUT Management System**
+  - LUT loading and parsing (.cube, .3dl formats)
+  - 1D and 3D LUT support with trilinear interpolation
+  - LUT library management with categories and favorites
+  - Metadata tracking (usage, tags, descriptions)
+  - Search and filtering capabilities
+  - Apply LUTs to clips and timelines
+  - Identity LUT creation
+  - Sample LUT files for testing
+  - Comprehensive test suite (14/16 tests passing)
+  - Full documentation in docs/LUT_WORKFLOWS.md
+
+### 0.2.0
 - **EDL Import/Export Support**
   - Complete CMX 3600 format parser and writer
   - EDL↔OTIO bidirectional conversion
