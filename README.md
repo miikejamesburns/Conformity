@@ -25,6 +25,14 @@ Conformity is a modular application designed to streamline post-production workf
   - Command history and saved queries
   - Autocomplete suggestions
   - LLM-ready architecture for future AI integration
+- **Production Tracker**: Comprehensive post-production workflow management
+  - Shot tracking through multiple departments (Editorial, VFX, Color, Sound, Finishing, Delivery)
+  - Task assignment and priority management
+  - Review and approval workflows
+  - Deliverables checklist and tracking
+  - Team and vendor directory
+  - Progress reporting and statistics
+  - Qt dashboard with visual progress indicators
 - **Asset Tracking**: Comprehensive media asset management and organization
 - **Modern UI**: Clean, intuitive interface built with PyQt6
 
@@ -58,10 +66,19 @@ conformity/
 │   │   └── color_pipeline.py
 │   ├── asset_tracker/       # Asset management
 │   │   └── asset_manager.py
+│   ├── production_tracker/  # Production workflow tracking
+│   │   ├── production_database.py  # SQLite database
+│   │   └── shot_tracker.py         # Workflow manager
+│   ├── commands/            # Natural language commands
+│   │   ├── command_parser.py      # Query parser
+│   │   ├── command_executor.py    # Command execution
+│   │   └── command_history.py     # History/saved queries
 │   └── ui_components/       # Qt UI widgets
 │       ├── conform_panel.py      # Conform operations UI
 │       ├── color_space_widget.py # Color management UI
 │       ├── timeline_widget.py
+│       ├── command_interface.py  # Command query UI
+│       ├── production_tracker_widget.py  # Production dashboard
 │       └── asset_browser.py
 ├── tests/                   # Unit tests
 ├── config/                  # Configuration files
@@ -956,7 +973,30 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.8.0 (Current)
+### 0.9.0 (Current)
+- **Production Tracker**
+  - Comprehensive production workflow tracking system
+  - SQLite database with 9 interconnected tables
+  - Project hierarchy: Projects → Sequences → Shots
+  - Multi-department tracking (Editorial, VFX, Color, Sound, Finishing, Delivery)
+  - Shot-level status tracking per department
+  - VFX complexity categorization (simple/medium/complex)
+  - Task management with assignment, priority, and time tracking
+  - Review and approval workflow with multi-stage feedback
+  - Deliverables checklist with category organization
+  - Team and vendor directory management
+  - Progress statistics and reporting
+  - Shots needing attention alerts (review/revision/blocked)
+  - Qt dashboard widget with visual progress bars
+  - Tabbed interface: Dashboard, Shots, Tasks, Deliverables, Team
+  - Department status color coding in shot table
+  - High-level ShotTracker workflow manager
+  - Direct ProductionDatabase access for advanced use
+  - Comprehensive documentation in docs/PRODUCTION_TRACKER.md
+  - Complete example workflows in examples/production_tracker_example.py
+  - Professional post-production management inspired by industry needs
+
+### 0.8.0
 - **Natural Language Command Interface**
   - Pattern-based natural language query parser
   - Command types: find, show, list, count, filter

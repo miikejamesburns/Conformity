@@ -117,7 +117,59 @@ python examples/command_interface_example.py
 - "list missing media"
 - "filter by approved status"
 
-### 5. Integrated Workflow Example (`integrated_workflow_example.py`)
+### 5. Production Tracker Example (`production_tracker_example.py`)
+
+Demonstrates comprehensive production tracking for film/TV post-production:
+
+- Project and sequence setup
+- Shot tracking across departments
+- Task management
+- Review workflows
+- Deliverables tracking
+- Team and vendor management
+- Progress reporting
+
+**Run:**
+```bash
+python examples/production_tracker_example.py
+```
+
+**Key concepts covered:**
+- Production database schema
+- Multi-department workflow tracking
+- Shot status management (Editorial, VFX, Color, Sound, Finishing, Delivery)
+- VFX complexity categorization
+- Task assignment with priorities and deadlines
+- Review and approval workflow
+- Revision request system
+- Deliverables checklist
+- Team and vendor directory
+- Progress statistics and attention flags
+
+**Example workflow:**
+```python
+# Create project
+tracker = ShotTracker(Path("production.db"))
+project_id = tracker.create_project(name="My Film")
+seq_id = tracker.add_sequence(project_id, "SEQ_010", "Opening")
+
+# Add shot
+shot_id = tracker.add_shot(
+    seq_id, "010_010", "Hero shot",
+    vfx_complexity=VFXComplexity.COMPLEX
+)
+
+# Track through VFX pipeline
+tracker.start_vfx(shot_id, vendor="VFX Studio Inc")
+tracker.submit_for_review(shot_id, Department.VFX)
+tracker.approve_shot(shot_id, Department.VFX, "supervisor@studio.com")
+
+# Get progress
+stats = tracker.get_shot_progress(project_id)
+print(f"VFX complete: {stats['vfx_complete']}/{stats['total_shots']}")
+```
+
+### 6. Integrated Workflow Example (`integrated_workflow_example.py`)
 
 Demonstrates complete real-world scenarios combining multiple systems:
 
@@ -274,7 +326,12 @@ We recommend exploring the examples in this order:
    python examples/command_interface_example.py
    ```
 
-5. **Study Integrated Workflows** - See how everything works together
+5. **Production Tracker** - Comprehensive production workflow management
+   ```bash
+   python examples/production_tracker_example.py
+   ```
+
+6. **Study Integrated Workflows** - See how everything works together
    ```bash
    python examples/integrated_workflow_example.py
    ```
@@ -321,6 +378,9 @@ results = scanner.scan_directory(
 
 - [Asset Tracking Documentation](../docs/ASSET_TRACKING.md) - Complete API reference
 - [Media Review Documentation](../docs/MEDIA_REVIEW.md) - Full feature guide
+- [Command Interface Documentation](../docs/COMMAND_INTERFACE.md) - Natural language queries
+- [Production Tracker Documentation](../docs/PRODUCTION_TRACKER.md) - Production workflow management
+- [tlRender Documentation](../docs/TLRENDER.md) - Professional playback system
 - [Main README](../README.md) - System overview
 - [Quick Start Guide](../docs/QUICKSTART.md) - Getting started
 
