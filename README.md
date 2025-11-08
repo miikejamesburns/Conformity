@@ -36,6 +36,25 @@ Conformity is a modular application designed to streamline post-production workf
 - **Asset Tracking**: Comprehensive media asset management and organization
 - **Modern UI**: Clean, intuitive interface built with PyQt6
 
+## 📚 Documentation
+
+Complete documentation is available in the `/docs` directory:
+
+- **[Deployment Guide](DEPLOYMENT_GUIDE.md)** - Complete installation, quick start, API reference, and roadmap
+- **[Architecture](docs/ARCHITECTURE.md)** - Technical architecture with diagrams and design patterns
+- **[Testing Guide](docs/TESTING.md)** - Comprehensive testing documentation
+- **[Production Tracker](docs/PRODUCTION_TRACKER.md)** - Production workflow management guide
+- **[Command Interface](docs/COMMAND_INTERFACE.md)** - Natural language query system
+- **[tlRender Integration](docs/TLRENDER.md)** - Professional playback system
+
+### Quick Links
+
+- **Installation**: See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md#installation)
+- **Quick Start**: See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md#quick-start)
+- **API Reference**: See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md#api-reference)
+- **Examples**: See [examples/README.md](examples/README.md)
+- **Testing**: See [docs/TESTING.md](docs/TESTING.md)
+
 ## Architecture
 
 Conformity follows a modular architecture with clear separation of concerns:
