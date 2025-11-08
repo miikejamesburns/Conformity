@@ -1,0 +1,19 @@
+TITLE: Multi-Track Edit
+FCM: DROP FRAME
+
+001  VIDCLIP1 V     C        01:00:00:00 01:00:10:00 00:00:00:00 00:00:10:00
+* FROM CLIP NAME: Main Camera.mov
+* SOURCE FILE: /media/cam1/main_camera.mov
+
+002  AUDCLIP1 A     C        01:00:00:00 01:00:10:00 00:00:00:00 00:00:10:00
+* FROM CLIP NAME: Dialog Track.wav
+* SOURCE FILE: /media/audio/dialog.wav
+
+003  VIDCLIP2 V     C        01:00:10:00 01:00:20:00 00:00:10:00 00:00:20:00
+* FROM CLIP NAME: B-Roll.mov
+* SOURCE FILE: /media/cam2/b_roll.mov
+
+004  AUDCLIP2 A     C        01:00:10:00 01:00:20:00 00:00:10:00 00:00:20:00
+* FROM CLIP NAME: Music Track.wav
+* SOURCE FILE: /media/audio/music.wav
+

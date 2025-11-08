@@ -14,10 +14,17 @@ pydantic>=2.5.0
 python-dotenv>=1.0.0
 pathlib>=1.0.1
 
+# Optional: Professional Playback with tlRender
+# Note: tlRender currently requires building from source
+# See docs/TLRENDER.md for installation instructions
+# Repository: https://github.com/darbyjohnston/tlRender
+# tlrender-python  # Uncomment when Python bindings are available
+
 # Development and Testing
 pytest>=7.4.0
 pytest-qt>=4.2.0
 pytest-cov>=4.1.0
+pytest-xdist>=3.5.0  # Parallel test execution
 black>=23.12.0
 flake8>=7.0.0
 mypy>=1.8.0

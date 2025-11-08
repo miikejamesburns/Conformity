@@ -1,0 +1,32 @@
+TITLE: Sample Test Timeline
+
+001  AX       V     C        01:00:00:00 01:00:05:00 00:00:00:00 00:00:05:00
+* FROM CLIP NAME: clip_001.mov
+* SCENE: 1A
+* TAKE: 3
+* COLOR_SPACE: rec709
+
+002  AX       V     C        01:00:00:00 01:00:04:00 00:00:05:00 00:00:09:00
+* FROM CLIP NAME: clip_002.mov
+* SCENE: 1B
+* TAKE: 1
+* COLOR_SPACE: rec709
+
+003  AX       V     C        01:00:00:00 01:00:06:00 00:00:09:00 00:00:15:00
+* FROM CLIP NAME: vfx_plate_001.exr
+* SCENE: 2A
+* SHOT: 010_010
+* VFX: TRUE
+* COLOR_SPACE: acescg
+
+004  AX       V     C        01:00:00:00 01:00:03:00 00:00:15:00 00:00:18:00
+* FROM CLIP NAME: clip_003.mov
+* SCENE: 2B
+* TAKE: 2
+* COLOR_SPACE: rec709
+
+005  AX       V     C        01:00:00:00 01:00:07:00 00:00:18:00 00:00:25:00
+* FROM CLIP NAME: clip_004.mov
+* SCENE: 3A
+* TAKE: 5
+* COLOR_SPACE: srgb
