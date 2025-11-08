@@ -948,7 +948,24 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.6.0 (Current)
+### 0.7.0 (Current)
+- **Professional Playback with tlRender**
+  - High-performance playback engine using tlRender
+  - Professional format support (EXR, DPX, ProRes, RED, ARRI, Blackmagic RAW)
+  - Hardware-accelerated rendering (OpenGL/Vulkan)
+  - OCIO color management integration
+  - Frame-accurate navigation and scrubbing
+  - Image sequence playback with intelligent caching
+  - Timeline playback with multi-track support
+  - Qt widget wrapper for GUI integration
+  - Speed control (normal, half, double, reverse playback)
+  - Keyboard shortcuts for efficient operation
+  - Optimized for high-resolution media (4K, 6K, 8K)
+  - Professional playback controls and monitoring
+  - Comprehensive documentation in docs/TLRENDER.md
+  - Example workflows and integration patterns
+
+### 0.6.0
 - **Media Review and Conform Verification**
   - Frame-accurate video playback with Qt Multimedia
   - Standard playback controls (play, pause, stop, scrub)
