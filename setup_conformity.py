@@ -72,11 +72,11 @@ class SetupChecker:
         Returns:
             Tuple of (installed, missing) package names
         """
-        print("\nChecking dependencies...")
+        print("\nChecking core dependencies...")
 
+        # Core requirements (must have)
         requirements = [
             "opentimelineio",
-            "PyOpenColorIO",
             "PyQt6",
             "PyYAML",
             "pydantic",
@@ -107,18 +107,38 @@ class SetupChecker:
         """
         print("\nChecking optional dependencies...")
 
-        optional = ["pytest-xdist", "black", "flake8", "mypy"]
+        # Optional dependencies with installation notes
+        optional = {
+            "PyOpenColorIO": "Color management (see requirements-optional.txt)",
+            "pytest-xdist": "Parallel test execution",
+            "black": "Code formatting",
+            "flake8": "Linting",
+            "mypy": "Type checking"
+        }
+
         missing = []
 
-        for package in optional:
+        for package, description in optional.items():
             try:
-                __import__(package.lower().replace("-", "_"))
-                print(f"✓ {package}")
+                # Special handling for PyOpenColorIO
+                if package == "PyOpenColorIO":
+                    import PyOpenColorIO as ocio
+                    print(f"✓ {package} (v{ocio.__version__})")
+                else:
+                    __import__(package.lower().replace("-", "_"))
+                    print(f"✓ {package}")
             except ImportError:
                 missing.append(package)
-                print(f"○ {package} (optional)")
+                print(f"○ {package} (optional) - {description}")
 
-        if missing:
+        # Special note for PyOpenColorIO if missing
+        if "PyOpenColorIO" in missing:
+            print("\n  ℹ️  PyOpenColorIO note:")
+            print("     Color management is optional. System will work without it.")
+            print("     For installation help: see requirements-optional.txt")
+            print(f"     Platform detected: {self.platform}")
+
+        if missing and len(missing) > 1:
             self.warnings.append(
                 f"Optional packages not installed: {', '.join(missing)}"
             )

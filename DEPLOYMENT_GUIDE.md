@@ -86,8 +86,22 @@ venv\Scripts\activate
 # Install core dependencies
 pip install -r requirements.txt
 
+# Note: PyOpenColorIO is optional and may fail to install on some platforms
+# See docs/INSTALLATION_TROUBLESHOOTING.md if you encounter errors
+
 # Verify installation
 python -c "import conformity; print('Installation successful!')"
+```
+
+**Troubleshooting:** If you see errors about PyOpenColorIO:
+- This is **normal** on Apple Silicon Macs and some platforms
+- PyOpenColorIO is **optional** - core features work without it
+- See [Installation Troubleshooting](docs/INSTALLATION_TROUBLESHOOTING.md) for solutions
+- Quick fix: Continue without color management (it's optional!)
+
+```bash
+# If installation fails, try the automated setup script:
+python setup_conformity.py --install
 ```
 
 #### 4. Verify Installation
