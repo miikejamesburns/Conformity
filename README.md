@@ -792,6 +792,29 @@ panel.show()
 app.exec()
 ```
 
+## Examples
+
+The `examples/` directory contains comprehensive, runnable examples demonstrating all systems:
+
+```bash
+# Asset tracking system examples
+python examples/asset_tracking_example.py
+
+# Media review system examples
+python examples/media_review_example.py
+
+# Integrated workflow examples
+python examples/integrated_workflow_example.py
+```
+
+Each example includes:
+- Complete working code
+- Clear documentation
+- Real-world scenarios
+- Integration patterns
+
+See [examples/README.md](examples/README.md) for detailed information about each example.
+
 ## Development
 
 ### Running Tests
