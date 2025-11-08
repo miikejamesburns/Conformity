@@ -2,7 +2,7 @@
 
 Common installation issues and solutions for Conformity.
 
-## PyOpenColorIO Installation Issues
+## PyOpenColorIO Installation (Required)
 
 ### Issue: "No matching distribution found for PyOpenColorIO"
 
@@ -18,33 +18,13 @@ PyOpenColorIO doesn't provide pre-built wheels (binary packages) for all platfor
 - Some Linux distributions
 - Certain Python versions
 
-**Solution Options:**
+**This is expected** - PyOpenColorIO is a required dependency that typically requires building from source.
 
-#### Option 1: Install Core Dependencies Only (Recommended for Getting Started)
+### Solution: Build PyOpenColorIO from Source
 
-PyOpenColorIO is **optional**. Conformity works without it:
+**Important:** PyOpenColorIO is **required** for Conformity's color management pipeline. Follow the platform-specific instructions below:
 
-```bash
-# Install core dependencies (without PyOpenColorIO)
-pip install -r requirements.txt
-
-# PyOpenColorIO is already commented out in requirements.txt
-# Core features will work fine
-```
-
-**What works without PyOpenColorIO:**
-- ✅ Timeline management (OTIO)
-- ✅ Asset tracking
-- ✅ Production tracking
-- ✅ Command interface
-- ✅ UI components
-- ✅ Demo mode
-
-**What requires PyOpenColorIO:**
-- ❌ OCIO color space transforms
-- ❌ Color management features
-
-#### Option 2: Build PyOpenColorIO from Source
+#### Option 1: Build PyOpenColorIO from Source (Standard Method)
 
 For users who need color management features:
 
@@ -105,9 +85,9 @@ vcpkg install opencolorio
 pip install PyOpenColorIO
 ```
 
-#### Option 3: Use Conda
+#### Option 3: Use Conda (Alternative)
 
-Conda provides pre-built binaries:
+Conda provides pre-built binaries which may work on some platforms:
 
 ```bash
 # Create conda environment
@@ -121,18 +101,7 @@ conda install -c conda-forge opencolorio
 pip install -r requirements.txt
 ```
 
-#### Option 4: Skip Color Management for Now
-
-You can always install PyOpenColorIO later:
-
-```bash
-# Install and use Conformity without color management
-pip install -r requirements.txt
-
-# Later, when you need color features:
-# See requirements-optional.txt for detailed instructions
-pip install PyOpenColorIO  # or follow build instructions above
-```
+**Note:** If conda installation succeeds, this is the easiest method. However, building from source is more reliable and gives you the latest version.
 
 ### Verifying PyOpenColorIO Installation
 
@@ -340,9 +309,9 @@ If you're still having issues:
    - Include: Output of `pip list`
    - Include: Output of `python setup_conformity.py --check`
 
-## Quick Start Without Optional Dependencies
+## Quick Start for Development
 
-To get started immediately without any optional dependencies:
+To get started with development quickly:
 
 ```bash
 # Clone repository
@@ -353,8 +322,13 @@ cd conformity
 python3.11 -m venv venv
 source venv/bin/activate
 
-# Install core dependencies only
-pip install opentimelineio PyQt6 PyYAML pydantic pytest pytest-cov
+# Install PyOpenColorIO first (required - see instructions above)
+# For macOS:
+brew install opencolorio
+pip install PyOpenColorIO
+
+# Install remaining dependencies
+pip install -r requirements.txt
 
 # Install in development mode
 pip install -e .
@@ -366,12 +340,11 @@ python run_tests.py --quick
 python -m conformity.demo.demo_mode
 ```
 
-This installs everything except:
-- PyOpenColorIO (color management)
+**Optional development tools** (not required for basic usage):
 - pytest-xdist (parallel testing)
-- black/flake8/mypy (development tools)
+- black/flake8/mypy (code quality tools)
 
-You can add these later as needed!
+These can be installed later as needed from requirements.txt.
 
 ---
 

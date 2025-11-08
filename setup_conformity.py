@@ -77,6 +77,7 @@ class SetupChecker:
         # Core requirements (must have)
         requirements = [
             "opentimelineio",
+            "PyOpenColorIO",  # May require building from source
             "PyQt6",
             "PyYAML",
             "pydantic",
@@ -89,12 +90,24 @@ class SetupChecker:
 
         for package in requirements:
             try:
-                __import__(package.lower().replace("-", "_"))
-                installed.append(package)
-                print(f"✓ {package}")
+                # Special handling for PyOpenColorIO to show version
+                if package == "PyOpenColorIO":
+                    import PyOpenColorIO as ocio
+                    installed.append(package)
+                    print(f"✓ {package} (v{ocio.__version__})")
+                else:
+                    __import__(package.lower().replace("-", "_"))
+                    installed.append(package)
+                    print(f"✓ {package}")
             except ImportError:
                 missing.append(package)
                 print(f"✗ {package} not found")
+
+                # Special note for PyOpenColorIO
+                if package == "PyOpenColorIO":
+                    print(f"  ℹ️  PyOpenColorIO requires building from source on some platforms")
+                    print(f"     Platform detected: {self.platform}")
+                    print(f"     See DEPLOYMENT_GUIDE.md for build instructions")
 
         return installed, missing
 
@@ -109,7 +122,6 @@ class SetupChecker:
 
         # Optional dependencies with installation notes
         optional = {
-            "PyOpenColorIO": "Color management (see requirements-optional.txt)",
             "pytest-xdist": "Parallel test execution",
             "black": "Code formatting",
             "flake8": "Linting",
@@ -120,23 +132,11 @@ class SetupChecker:
 
         for package, description in optional.items():
             try:
-                # Special handling for PyOpenColorIO
-                if package == "PyOpenColorIO":
-                    import PyOpenColorIO as ocio
-                    print(f"✓ {package} (v{ocio.__version__})")
-                else:
-                    __import__(package.lower().replace("-", "_"))
-                    print(f"✓ {package}")
+                __import__(package.lower().replace("-", "_"))
+                print(f"✓ {package}")
             except ImportError:
                 missing.append(package)
                 print(f"○ {package} (optional) - {description}")
-
-        # Special note for PyOpenColorIO if missing
-        if "PyOpenColorIO" in missing:
-            print("\n  ℹ️  PyOpenColorIO note:")
-            print("     Color management is optional. System will work without it.")
-            print("     For installation help: see requirements-optional.txt")
-            print(f"     Platform detected: {self.platform}")
 
         if missing and len(missing) > 1:
             self.warnings.append(
