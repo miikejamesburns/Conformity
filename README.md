@@ -279,6 +279,34 @@ Qt-based user interface widgets:
   - Double-click for detailed asset information
   - Real-time statistics display
 
+- **playback_widget.py**: Media playback for conform review
+  - Frame-accurate video playback with Qt Multimedia
+  - Standard controls (play, pause, stop, scrub)
+  - Frame-by-frame navigation (forward/back)
+  - Timecode display (HH:MM:SS:FF)
+  - Image sequence support (auto-detection and playback)
+  - Keyboard shortcuts for efficient navigation
+  - Progress tracking and duration display
+
+- **conform_review_widget.py**: Side-by-side conform verification
+  - Dual playback widgets for source vs conform
+  - Synchronized playback option
+  - Frame markers (issue, note, approved)
+  - Marker navigation (double-click to jump)
+  - Difference overlay mode
+  - Export marked frames to file
+  - Generate comprehensive review reports
+  - Review statistics (issues, notes, approved frames)
+
+- **review_panel.py**: Clip metadata and review panel
+  - Display file information (path, name, size)
+  - Technical specifications (resolution, frame rate, codec)
+  - Color information (color space, primaries, transfer)
+  - Audio information (codec, channels, sample rate)
+  - Review status tracking (pending, approved, rejected)
+  - Review notes text field
+  - Status and notes signals
+
 - **asset_browser.py**: Legacy asset management UI
   - Browse registered assets
   - Scan directories
@@ -706,6 +734,64 @@ print(f"Total associations: {report['total_associations']}")
 print(f"Unused assets: {report['unused_assets']}")
 ```
 
+### Media Review and Conform Verification
+
+```python
+from pathlib import Path
+from PyQt6.QtWidgets import QApplication
+from conformity.ui_components.playback_widget import PlaybackWidget
+from conformity.ui_components.conform_review_widget import ConformReviewWidget
+from conformity.ui_components.review_panel import ReviewPanel
+
+# Basic playback
+app = QApplication([])
+player = PlaybackWidget()
+player.load_media(Path("media/footage.mp4"), frame_rate=24.0)
+player.show()
+
+# Side-by-side conform review
+review = ConformReviewWidget()
+review.load_source_and_conform(
+    Path("source/original.mp4"),
+    Path("conform/conformed.mp4")
+)
+
+# Enable synchronized playback
+review.sync_checkbox.setChecked(True)
+
+# Add markers during review (or use keyboard: I=issue, N=note, A=approved)
+review._add_marker("issue")  # Red marker
+review._add_marker("note")   # Yellow marker
+review._add_marker("approved")  # Green marker
+
+# Export review report
+review._export_review_report()
+
+# Get review results
+results = review.get_review_results()
+print(f"Issues: {results['issues']}")
+print(f"Approved frames: {results['approved']}")
+
+review.show()
+
+# Metadata review panel
+panel = ReviewPanel()
+panel.load_file(Path("media/deliverable.mp4"))
+
+# Set review status
+panel.set_status("In Review")
+panel.set_notes("Checking color accuracy against source")
+
+# Get review data
+data = panel.get_review_data()
+print(f"Status: {data['status']}")
+print(f"Resolution: {data['metadata']['width']}x{data['metadata']['height']}")
+
+panel.show()
+
+app.exec()
+```
+
 ## Development
 
 ### Running Tests
@@ -831,7 +917,26 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.5.0 (Current)
+### 0.6.0 (Current)
+- **Media Review and Conform Verification**
+  - Frame-accurate video playback with Qt Multimedia
+  - Standard playback controls (play, pause, stop, scrub)
+  - Frame-by-frame navigation (forward/back with arrow keys)
+  - Timecode display (HH:MM:SS:FF) with configurable frame rates
+  - Image sequence support (auto-detection and playback)
+  - Side-by-side conform verification widget
+  - Synchronized playback for source vs conform comparison
+  - Frame marker system (issue, note, approved)
+  - Marker navigation and management
+  - Export marked frames and comprehensive review reports
+  - Review panel with technical metadata display
+  - Color space information display
+  - Review status tracking (pending, approved, rejected)
+  - Keyboard shortcuts for efficient workflow
+  - Comprehensive test suite (15+ tests passing)
+  - Full documentation in docs/MEDIA_REVIEW.md
+
+### 0.5.0
 - **Asset Tracking System**
   - SQLite database backend for persistent storage
   - Asset metadata storage (paths, types, technical specs)
