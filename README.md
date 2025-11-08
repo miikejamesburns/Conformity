@@ -75,6 +75,16 @@ Handles all timeline and conform operations using OpenTimelineIO:
   - Export to multiple formats with metadata preservation
   - Error handling with custom exceptions
 
+- **edl_utils.py**: Comprehensive EDL/CMX 3600 support
+  - EDLParser: Parse CMX 3600 EDL files
+  - EDLWriter: Write EDL files with custom options
+  - EDLConverter: Bidirectional OTIO↔EDL conversion
+  - Reel name management and comment preservation
+  - Timecode validation and formatting
+  - Support for cuts, dissolves, wipes, and keys
+  - Multi-track video and audio handling
+  - EDL validation utilities
+
 - **timeline_manager.py**: High-level timeline operations
   - Load/save timelines from various formats
   - Create new timelines
@@ -284,6 +294,36 @@ print(f"Timeline: {info['name']}, Clips: {info['clips']}")
 manager.save_timeline(timeline, Path("output.otio"))
 ```
 
+### Working with EDL Files
+
+```python
+from pathlib import Path
+from conformity.conform_engine.edl_utils import EDLParser, EDLWriter, EDLConverter
+
+# Parse an EDL file
+parser = EDLParser()
+edl_info = parser.parse_file(Path("timeline.edl"))
+
+print(f"Title: {edl_info.title}")
+print(f"Events: {len(edl_info.events)}")
+
+for event in edl_info.events:
+    print(f"Event {event.event_number}: {event.clip_name or event.reel_name}")
+    print(f"  Track: {event.track_type.value}, Edit: {event.edit_type.value}")
+    print(f"  Source TC: {event.source_in} - {event.source_out}")
+
+# Convert EDL to OTIO timeline
+converter = EDLConverter()
+timeline = converter.edl_to_timeline(edl_info, fps=24.0)
+
+# Modify timeline...
+
+# Convert back to EDL and save
+output_edl = converter.timeline_to_edl(timeline, title="Modified Timeline")
+writer = EDLWriter()
+writer.write_file(output_edl, Path("output.edl"))
+```
+
 ### Holistic Color Management
 
 ```python
@@ -437,7 +477,7 @@ Conformity/
 
 Future enhancements planned:
 
-- [ ] EDL import/export support
+- [x] **EDL import/export support** - Complete CMX 3600 support with parsing, writing, validation
 - [ ] Advanced timeline editing tools
 - [ ] LUT application and management
 - [ ] Render queue management
@@ -475,7 +515,20 @@ For issues, questions, or contributions:
 
 ## Version History
 
-### 0.1.0 (Current)
+### 0.2.0 (Current)
+- **EDL Import/Export Support**
+  - Complete CMX 3600 format parser and writer
+  - EDL↔OTIO bidirectional conversion
+  - Reel name management and comment preservation
+  - Support for cuts, dissolves, wipes, and keys
+  - Multi-track video and audio handling
+  - Timecode validation and formatting
+  - Sample EDL files and comprehensive tests
+  - Full documentation in docs/EDL_WORKFLOWS.md
+- UI enhancements for EDL metadata display
+- Updated conform panel to show reel names and CMX data
+
+### 0.1.0
 - Initial prototype release
 - Basic timeline management with OTIO
 - OCIO integration for color management

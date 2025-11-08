@@ -19,6 +19,7 @@ import opentimelineio as otio
 
 from ..conform_engine.conform_engine import ConformEngine, TimelineFormat, TimelineInfo, ClipInfo
 from ..conform_engine.exceptions import ConformError
+from ..conform_engine.edl_utils import EDLParser, EDLConverter, validate_edl_file
 from ..core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -402,10 +403,23 @@ class ConformPanel(QWidget):
                 f"for {sr.duration.value} frames"
             )
 
+        # EDL/CMX metadata
+        if "cmx_3600" in clip.metadata:
+            cmx_data = clip.metadata["cmx_3600"]
+            details.append("<br><b>EDL Information:</b>")
+            if "reel" in cmx_data:
+                details.append(f"  • <b>Reel:</b> {cmx_data['reel']}")
+            if "event_number" in cmx_data:
+                details.append(f"  • <b>Event #:</b> {cmx_data['event_number']}")
+            if "comments" in cmx_data and cmx_data['comments']:
+                details.append(f"  • <b>Comments:</b>")
+                for comment in cmx_data['comments']:
+                    details.append(f"      {comment}")
+
         # Media reference
         if clip.media_reference:
             if isinstance(clip.media_reference, otio.schema.ExternalReference):
-                details.append(f"<b>Media Path:</b> {clip.media_reference.target_url}")
+                details.append(f"<br><b>Media Path:</b> {clip.media_reference.target_url}")
                 # Check if file exists
                 media_path = Path(clip.media_reference.target_url)
                 status = "✓ Online" if media_path.exists() else "✗ Offline"
@@ -431,10 +445,11 @@ class ConformPanel(QWidget):
                     marker_name = marker.name or "Unnamed"
                     details.append(f"  • {marker_name}")
 
-        # Metadata
-        if clip.metadata:
+        # Metadata (excluding cmx_3600 which we already showed)
+        other_metadata = {k: v for k, v in clip.metadata.items() if k != "cmx_3600"}
+        if other_metadata:
             details.append("<br><b>Metadata:</b>")
-            for key, value in clip.metadata.items():
+            for key, value in other_metadata.items():
                 details.append(f"  • {key}: {value}")
 
         self._details_text.setHtml("<br>".join(details))

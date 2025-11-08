@@ -1,0 +1,15 @@
+TITLE: Simple Cuts Timeline
+FCM: NON-DROP FRAME
+
+001  CLIP001  V     C        01:00:00:00 01:00:05:00 00:00:00:00 00:00:05:00
+* FROM CLIP NAME: Opening Shot.mov
+* SOURCE FILE: /media/footage/opening_shot.mov
+
+002  CLIP002  V     C        01:00:10:00 01:00:15:00 00:00:05:00 00:00:10:00
+* FROM CLIP NAME: Mid Shot.mov
+* SOURCE FILE: /media/footage/mid_shot.mov
+
+003  CLIP003  V     C        01:00:20:00 01:00:30:00 00:00:10:00 00:00:20:00
+* FROM CLIP NAME: Closing Shot.mov
+* SOURCE FILE: /media/footage/closing_shot.mov
+

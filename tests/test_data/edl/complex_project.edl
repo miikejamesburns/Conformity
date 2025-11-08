@@ -1,0 +1,46 @@
+TITLE: Complex Project Timeline
+FCM: NON-DROP FRAME
+
+001  RED001   V     C        01:00:10:15 01:00:15:20 00:00:00:00 00:00:05:05
+* FROM CLIP NAME: RED_Clip_A001_C001.R3D
+* SOURCE FILE: /media/red/A001_C001.R3D
+* COMMENT: Opening establishing shot
+
+002  RED001   V     C        01:00:20:00 01:00:28:12 00:00:05:05 00:00:13:17
+* FROM CLIP NAME: RED_Clip_A001_C002.R3D
+* SOURCE FILE: /media/red/A001_C002.R3D
+* COMMENT: Wide shot of main subject
+
+003  ARRI001  V     D    018 01:00:05:00 01:00:12:00 00:00:13:11 00:00:20:11
+* FROM CLIP NAME: ARRI_Clip_B001.ari
+* SOURCE FILE: /media/arri/B001.ari
+* COMMENT: Dissolve to close-up
+* DISSOLVE
+
+004  ARRI001  V     C        01:00:15:00 01:00:22:15 00:00:20:11 00:00:28:02
+* FROM CLIP NAME: ARRI_Clip_B002.ari
+* SOURCE FILE: /media/arri/B002.ari
+
+005  BMDFILM1 V     C        01:00:00:00 01:00:10:00 00:00:28:02 00:00:38:02
+* FROM CLIP NAME: Blackmagic_C001.braw
+* SOURCE FILE: /media/braw/C001.braw
+* COMMENT: B-roll footage
+
+006  AX       V     C        01:00:00:00 01:00:05:00 00:00:38:02 00:00:43:02
+* FROM CLIP NAME: Graphics_Lower_Third.mov
+* SOURCE FILE: /media/gfx/lower_third.mov
+* COMMENT: Title overlay
+
+007  AUDIO1   A1    C        01:00:00:00 01:00:43:02 00:00:00:00 00:00:43:02
+* FROM CLIP NAME: Dialog_Mix.wav
+* SOURCE FILE: /media/audio/dialog_mix.wav
+
+008  AUDIO2   A2    C        01:00:00:00 01:00:43:02 00:00:00:00 00:00:43:02
+* FROM CLIP NAME: Music_Score.wav
+* SOURCE FILE: /media/audio/music_score.wav
+
+009  RED002   V     C        01:01:00:00 01:01:08:00 00:00:43:02 00:00:51:02
+* FROM CLIP NAME: RED_Clip_A002_C001.R3D
+* SOURCE FILE: /media/red/A002_C001.R3D
+* COMMENT: Final shot
+
