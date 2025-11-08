@@ -176,11 +176,9 @@ class DemoProject:
                 'color_space': 'rec709'
             })
 
-            self.asset_db.add_tags(asset_id, [
-                'footage',
-                f'scene_{footage["scene"]}',
-                f'camera_{footage["camera"]}'
-            ])
+            # Add tags
+            for tag in ['footage', f'scene_{footage["scene"]}', f'camera_{footage["camera"]}']:
+                self.asset_db.add_tag(asset_id, tag)
 
             self.asset_ids.append(asset_id)
 
@@ -214,12 +212,9 @@ class DemoProject:
                 'vfx_complexity': render['complexity']
             })
 
-            self.asset_db.add_tags(asset_id, [
-                'vfx',
-                'render',
-                f'shot_{render["shot"]}',
-                render['complexity']
-            ])
+            # Add tags
+            for tag in ['vfx', 'render', f'shot_{render["shot"]}', render['complexity']]:
+                self.asset_db.add_tag(asset_id, tag)
 
             self.asset_ids.append(asset_id)
 
