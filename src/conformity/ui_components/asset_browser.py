@@ -7,13 +7,14 @@ This module provides Qt widgets for browsing and managing media assets.
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QListWidget, QListWidgetItem, QPushButton,
-    QGroupBox, QFileDialog, QMessageBox
+    QGroupBox, QFileDialog, QMessageBox, QSplitter
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 from pathlib import Path
 from typing import Optional, List
 from ..asset_tracker.asset_manager import AssetManager, AssetStatus, AssetType
 from ..core.logger import get_logger
+from .media_preview_widget import MediaPreviewWidget
 
 logger = get_logger(__name__)
 
@@ -42,7 +43,17 @@ class AssetBrowserWidget(QWidget):
 
     def _setup_ui(self):
         """Set up the user interface."""
-        layout = QVBoxLayout(self)
+        # Main layout
+        main_layout = QHBoxLayout(self)
+        main_layout.setContentsMargins(5, 5, 5, 5)
+
+        # Create splitter for resizable panels
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # Left panel - asset browser controls and list
+        left_panel = QWidget()
+        left_layout = QVBoxLayout(left_panel)
+        left_layout.setContentsMargins(0, 0, 0, 0)
 
         # Statistics group
         stats_group = QGroupBox("Asset Statistics")
@@ -63,7 +74,7 @@ class AssetBrowserWidget(QWidget):
         stats_layout.addWidget(self._size_label)
 
         stats_group.setLayout(stats_layout)
-        layout.addWidget(stats_group)
+        left_layout.addWidget(stats_group)
 
         # Control buttons
         button_layout = QHBoxLayout()
@@ -80,7 +91,7 @@ class AssetBrowserWidget(QWidget):
         self._refresh_button.clicked.connect(self._refresh_display)
         button_layout.addWidget(self._refresh_button)
 
-        layout.addLayout(button_layout)
+        left_layout.addLayout(button_layout)
 
         # Assets list
         assets_group = QGroupBox("Assets")
@@ -91,18 +102,36 @@ class AssetBrowserWidget(QWidget):
         assets_layout.addWidget(self._assets_list)
 
         assets_group.setLayout(assets_layout)
-        layout.addWidget(assets_group)
+        left_layout.addWidget(assets_group)
 
-        # Asset details
-        details_group = QGroupBox("Asset Details")
+        # Asset details (kept smaller now that we have preview)
+        details_group = QGroupBox("Quick Info")
         details_layout = QVBoxLayout()
 
         self._details_label = QLabel("Select an asset to view details")
         self._details_label.setWordWrap(True)
+        self._details_label.setMaximumHeight(80)
         details_layout.addWidget(self._details_label)
 
         details_group.setLayout(details_layout)
-        layout.addWidget(details_group)
+        left_layout.addWidget(details_group)
+
+        # Right panel - media preview
+        self._preview_widget = MediaPreviewWidget()
+
+        # Add panels to splitter
+        splitter.addWidget(left_panel)
+        splitter.addWidget(self._preview_widget)
+
+        # Set initial sizes (40% left, 60% right for preview)
+        splitter.setSizes([400, 600])
+
+        # Set minimum sizes
+        left_panel.setMinimumWidth(350)
+        self._preview_widget.setMinimumWidth(400)
+
+        # Add splitter to main layout
+        main_layout.addWidget(splitter)
 
         # Initial display
         self._refresh_display()
@@ -166,6 +195,10 @@ class AssetBrowserWidget(QWidget):
         if asset:
             details = self._format_asset_details(asset)
             self._details_label.setText(details)
+
+            # Update preview widget
+            self._preview_widget.set_asset(asset)
+
             self.asset_selected.emit(asset)
             logger.debug(f"Asset selected: {asset.name}")
 
