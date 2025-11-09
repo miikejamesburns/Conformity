@@ -23,7 +23,8 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "opentimelineio>=0.16.0",
-        "PyOpenColorIO>=2.3.0",
+        # Note: PyOpenColorIO is optional - install via requirements-full.txt for color management
+        # Package name is 'opencolorio' on PyPI (imports as 'PyOpenColorIO')
         "PyQt6>=6.6.0",
         "PyYAML>=6.0.0",
         "pydantic>=2.5.0",
