@@ -320,6 +320,11 @@ class ColorManager:
             Tuple of (status, warnings)
         """
         warnings = []
+
+        # Check for missing color space first (before OCIO validation)
+        if not assignment.input_color_space:
+            return ColorSpaceStatus.MISSING, ["No input color space assigned"]
+
         config = self._ocio_manager.get_config()
 
         if not config:
@@ -355,10 +360,6 @@ class ColorManager:
                 if assignment.view not in views:
                     warnings.append(f"Invalid view '{assignment.view}' for display '{assignment.display}'")
                     return ColorSpaceStatus.INVALID, warnings
-
-        # If no color space assigned, mark as missing
-        if not assignment.input_color_space:
-            return ColorSpaceStatus.MISSING, ["No input color space assigned"]
 
         return ColorSpaceStatus.VALID, warnings
 

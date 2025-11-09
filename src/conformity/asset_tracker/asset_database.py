@@ -621,6 +621,35 @@ class AssetDatabase:
             logger.error(f"Failed to add tag: {e}")
             return False
 
+    def add_tags(self, asset_id: int, tags: list) -> bool:
+        """
+        Add multiple tags to an asset.
+
+        Args:
+            asset_id: Asset ID
+            tags: List of tag names
+
+        Returns:
+            True if all successful
+        """
+        success = True
+        for tag in tags:
+            if not self.add_tag(asset_id, tag):
+                success = False
+        return success
+
+    def get_asset(self, asset_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Get asset by ID (alias for get_asset_by_id for convenience).
+
+        Args:
+            asset_id: Asset ID
+
+        Returns:
+            Asset dictionary or None if not found
+        """
+        return self.get_asset_by_id(asset_id)
+
     def get_statistics(self) -> Dict[str, Any]:
         """
         Get database statistics.

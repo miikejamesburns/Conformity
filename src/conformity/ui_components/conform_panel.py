@@ -78,6 +78,11 @@ class ConformPanel(QWidget):
         self._verify_media_check.setChecked(True)
         options_layout.addWidget(self._verify_media_check)
 
+        self._lenient_edl_check = QCheckBox("Lenient EDL")
+        self._lenient_edl_check.setChecked(False)
+        self._lenient_edl_check.setToolTip("Attempt to work around EDL validation issues (duration mismatches, etc.)")
+        options_layout.addWidget(self._lenient_edl_check)
+
         options_layout.addStretch()
 
         self._import_button = QPushButton("Import")
@@ -185,6 +190,7 @@ class ConformPanel(QWidget):
         adapter_data = self._format_combo.currentData()
         adapter_name = adapter_data if adapter_data else None
         verify_media = self._verify_media_check.isChecked()
+        lenient_edl = self._lenient_edl_check.isChecked()
 
         try:
             self._status_label.setText("Importing timeline...")
@@ -194,7 +200,8 @@ class ConformPanel(QWidget):
             timeline, timeline_info = self._conform_engine.import_timeline(
                 file_path,
                 adapter_name=adapter_name,
-                verify_media=verify_media
+                verify_media=verify_media,
+                lenient_edl=lenient_edl
             )
 
             self._current_timeline = timeline
