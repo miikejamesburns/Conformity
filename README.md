@@ -381,14 +381,53 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
+
+**Core only** (timeline operations):
 ```bash
 pip install -r requirements.txt
+```
+
+**Full install** (includes optional color management):
+```bash
+pip install -r requirements-full.txt
 ```
 
 4. Install in development mode (optional):
 ```bash
 pip install -e .
 ```
+
+### Optional Dependencies
+
+Conformity includes optional professional features:
+
+#### Check What's Installed
+```bash
+python3 -m conformity.core.dependencies
+```
+
+#### PyOpenColorIO (Color Management) ✨ Pre-built wheels available!
+Enables professional color workflows, LUTs, and ACES pipelines.
+
+**Easy install via PyPI:**
+```bash
+pip install opencolorio>=2.3.0
+```
+*Note: Package name is `opencolorio`, but imports as `PyOpenColorIO`*
+
+Or use the full requirements file:
+```bash
+pip install -r requirements-full.txt
+```
+
+**Alternative methods**: [docs/BUILDING_OPTIONAL_DEPS.md](docs/BUILDING_OPTIONAL_DEPS.md#pyopencolorio)
+
+#### tlRender (Professional Playback)
+Enables hardware-accelerated playback, professional formats (EXR, DPX, ProRes, RED, ARRI), and image sequences.
+
+**Build from source**: See [docs/BUILDING_OPTIONAL_DEPS.md](docs/BUILDING_OPTIONAL_DEPS.md#tlrender)
+
+> **Note:** Conformity works without these dependencies - they only enable advanced features. The application detects and uses them automatically if installed.
 
 ## Running the Application
 
