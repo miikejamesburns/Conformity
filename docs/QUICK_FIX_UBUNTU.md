@@ -85,15 +85,23 @@ source venv/bin/activate  # Activate your venv
 source scripts/setup_ubuntu_environment.sh
 ```
 
-**Fix Option 3 - Use System Python:**
+**Fix Option 3 - Use System Python (Best Long-term Solution):**
 ```bash
 # Recreate venv with system Python instead of miniconda
 deactivate
-rm -rf venv
-python3 -m venv venv  # Use system Python 3.11
+cd /path/to/Conformity
+
+# Use the automated script:
+./scripts/create_system_venv.sh
+
+# Or manually specify system Python:
+/usr/bin/python3 -m venv venv  # NOT just "python3" - that may be conda!
 source venv/bin/activate
 pip install -r requirements.txt
+./scripts/install_opentimelineio_ubuntu.sh
 ```
+
+**Important:** Don't use `python3 -m venv venv` if you have conda/miniconda - it will still use conda's Python! You must use the full path like `/usr/bin/python3` or use the `create_system_venv.sh` script.
 
 ### Error: "Python.h: No such file or directory"
 

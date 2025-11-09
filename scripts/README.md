@@ -108,6 +108,35 @@ source scripts/setup_ubuntu_environment.sh
 
 ---
 
+### `create_system_venv.sh`
+
+**Create virtual environment with system Python** - avoids all GLIBCXX issues permanently.
+
+**What it does:**
+1. Locates system Python (not conda/miniconda)
+2. Removes existing venv if present
+3. Creates new venv using system Python
+4. Verifies the venv is correctly configured
+5. Provides next steps for installation
+
+**Usage:**
+```bash
+cd /path/to/Conformity
+./scripts/create_system_venv.sh
+```
+
+**Time:** ~1 minute
+
+**Use this if:**
+- ✅ You have conda/miniconda and want to avoid ALL library issues
+- ✅ You keep getting GLIBCXX errors despite other fixes
+- ✅ You want a clean start with system Python
+- ✅ Recommended for Ubuntu users with conda installed
+
+**This is the best long-term solution** - eliminates all library version conflicts at the source by using system Python instead of conda Python.
+
+---
+
 ### `install_openimageio_ubuntu.sh`
 
 **Install OpenImageIO** - adds support for professional image formats (EXR, DPX, etc.)
