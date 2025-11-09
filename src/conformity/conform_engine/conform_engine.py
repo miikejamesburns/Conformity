@@ -98,8 +98,9 @@ class ConformEngine:
         try:
             manifest = otio.plugins.ActiveManifest()
             adapters = []
-            for adapter_name in manifest.adapters:
-                adapters.append(adapter_name)
+            for adapter in manifest.adapters:
+                # Adapter object has a .name attribute
+                adapters.append(adapter.name)
             return adapters
         except Exception as e:
             logger.warning(f"Failed to detect adapters: {e}")
@@ -218,8 +219,9 @@ class ConformEngine:
             self._parse_track(track, info, verify_media)
 
         # Count markers
-        if hasattr(timeline, 'markers'):
-            info.num_markers = len(timeline.markers())
+        # In OTIO 0.16+, markers is a property not a method
+        if hasattr(timeline, 'markers') and timeline.markers:
+            info.num_markers = len(timeline.markers)
 
         logger.debug(
             f"Parsed timeline: {info.num_clips} clips, "
@@ -236,7 +238,8 @@ class ConformEngine:
     ) -> None:
         """Parse a track and add its contents to timeline info."""
         track_name = track.name or f"Track_{info.num_tracks}"
-        track_kind = track.kind.name if track.kind else "Unknown"
+        # In OTIO 0.16+, track.kind is already a string, not an enum
+        track_kind = str(track.kind) if track.kind else "Unknown"
 
         for item in track:
             if isinstance(item, otio.schema.Clip):
@@ -311,13 +314,15 @@ class ConformEngine:
                 logger.warning(f"Missing reference for clip: {clip.name}")
 
         # Extract effects
-        if hasattr(clip, 'effects'):
-            for effect in clip.effects():
+        # In OTIO 0.16+, effects is a property not a method
+        if hasattr(clip, 'effects') and clip.effects:
+            for effect in clip.effects:
                 clip_info.effects.append(effect.name or type(effect).__name__)
 
         # Extract markers
-        if hasattr(clip, 'markers'):
-            for marker in clip.markers():
+        # In OTIO 0.16+, markers is a property not a method
+        if hasattr(clip, 'markers') and clip.markers:
+            for marker in clip.markers:
                 marker_data = {
                     'name': marker.name,
                     'marked_range': str(marker.marked_range) if marker.marked_range else None,
