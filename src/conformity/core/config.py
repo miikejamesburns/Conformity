@@ -76,6 +76,9 @@ class ConfigManager:
         # Override with environment variables
         config_dict = self._apply_env_overrides(config_dict)
 
+        # Filter out None values to allow Pydantic default_factory to work
+        config_dict = {k: v for k, v in config_dict.items() if v is not None}
+
         # Create config object
         self._config = ConformityConfig(**config_dict)
         return self._config
