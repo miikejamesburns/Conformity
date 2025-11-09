@@ -75,20 +75,48 @@ if [ -n "$VENV_PATH" ]; then
     # Find Python version in venv
     PYTHON_VERSION=$($VENV_PATH/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 
-    # Find system OpenImageIO package location
-    SYSTEM_OIIO=$(python3 -c "import sys; print([p for p in sys.path if 'dist-packages' in p][0])" 2>/dev/null)/OpenImageIO.so
-
     # Create symlink in venv site-packages
     VENV_SITE_PACKAGES="$VENV_PATH/lib/python${PYTHON_VERSION}/site-packages"
 
-    if [ -f "$SYSTEM_OIIO" ]; then
-        ln -sf "$SYSTEM_OIIO" "$VENV_SITE_PACKAGES/OpenImageIO.so"
-        echo -e "${GREEN}✓ Symlink created: $VENV_SITE_PACKAGES/OpenImageIO.so${NC}"
+    # Find system OpenImageIO package - try multiple locations and names
+    SYSTEM_OIIO=""
+
+    # Try to find via Python import first
+    SYSTEM_OIIO=$(python3 -c "import OpenImageIO; print(OpenImageIO.__file__)" 2>/dev/null || echo "")
+
+    # If that fails, search in common locations
+    if [ -z "$SYSTEM_OIIO" ] || [ ! -f "$SYSTEM_OIIO" ]; then
+        SYSTEM_OIIO=$(find /usr/lib -name "OpenImageIO.so" -o -name "_OpenImageIO*.so" -o -name "OpenImageIO.cpython*.so" 2>/dev/null | head -1)
+    fi
+
+    # Also check dist-packages directly
+    if [ -z "$SYSTEM_OIIO" ] || [ ! -f "$SYSTEM_OIIO" ]; then
+        for distpkg in /usr/lib/python3/dist-packages /usr/lib/python${PYTHON_VERSION}/dist-packages; do
+            if [ -f "$distpkg/OpenImageIO.so" ]; then
+                SYSTEM_OIIO="$distpkg/OpenImageIO.so"
+                break
+            fi
+        done
+    fi
+
+    if [ -n "$SYSTEM_OIIO" ] && [ -f "$SYSTEM_OIIO" ]; then
+        # Get just the filename in case it has a python version suffix
+        OIIO_FILENAME=$(basename "$SYSTEM_OIIO")
+        ln -sf "$SYSTEM_OIIO" "$VENV_SITE_PACKAGES/$OIIO_FILENAME"
+        # Also create a generic symlink if the filename has version info
+        if [[ "$OIIO_FILENAME" != "OpenImageIO.so" ]]; then
+            ln -sf "$SYSTEM_OIIO" "$VENV_SITE_PACKAGES/OpenImageIO.so"
+        fi
+        echo -e "${GREEN}✓ Symlink created: $VENV_SITE_PACKAGES/OpenImageIO.so -> $SYSTEM_OIIO${NC}"
     else
-        echo -e "${YELLOW}Warning: Could not find system OpenImageIO.so at expected location${NC}"
-        echo "You may need to manually link it:"
-        echo "  find /usr/lib -name 'OpenImageIO*.so'"
-        echo "  ln -s /path/to/OpenImageIO.so $VENV_SITE_PACKAGES/"
+        echo -e "${YELLOW}Warning: Could not find system OpenImageIO.so${NC}"
+        echo "Searched locations:"
+        echo "  - /usr/lib/python3/dist-packages"
+        echo "  - /usr/lib (recursive)"
+        echo ""
+        echo "Manual steps:"
+        echo "  1. Find the .so file: find /usr/lib -name '*OpenImageIO*.so'"
+        echo "  2. Create symlink: ln -s /path/to/file $VENV_SITE_PACKAGES/"
     fi
 fi
 
