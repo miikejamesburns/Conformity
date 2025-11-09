@@ -361,6 +361,22 @@ Qt-based user interface widgets:
 
 ## Installation
 
+### 🐧 Ubuntu/Debian Users
+
+**We have a dedicated Ubuntu installation guide with automated scripts!**
+
+👉 **[Ubuntu Installation Guide](docs/UBUNTU_INSTALLATION.md)**
+
+```bash
+# Quick automated install
+cd /path/to/Conformity
+./scripts/install_opencolorio_ubuntu.sh
+```
+
+This handles all dependencies and builds OpenColorIO automatically. For other platforms, continue below.
+
+---
+
 ### Prerequisites
 
 - Python 3.8 or higher

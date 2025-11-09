@@ -2,6 +2,27 @@
 
 Common installation issues and solutions for Conformity.
 
+## 🐧 Ubuntu/Debian Users - Start Here!
+
+**If you're on Ubuntu/Debian**, we have a **comprehensive dedicated guide** and **automated installation scripts**:
+
+👉 **[Ubuntu Installation Guide](UBUNTU_INSTALLATION.md)** - Complete step-by-step instructions
+
+### Quick Start (Ubuntu):
+
+```bash
+# Automated installation (recommended)
+cd /path/to/Conformity
+./scripts/install_opencolorio_ubuntu.sh
+
+# Or just install dependencies
+./scripts/setup_ubuntu_dependencies.sh
+```
+
+The automated scripts handle all the complexity for you. Continue reading below for manual installation or if you encounter issues.
+
+---
+
 ## PyOpenColorIO Installation (Required)
 
 ### Issue: "No matching distribution found for PyOpenColorIO"
@@ -58,20 +79,55 @@ make install
 ```
 
 **Linux (Ubuntu/Debian):**
-```bash
-# Install OpenColorIO library
-sudo apt-get update
-sudo apt-get install libopencolorio-dev python3-opencolorio
 
-# Or build from source
-sudo apt-get install cmake ninja-build
-git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
+⚠️ **The commands below are INCOMPLETE and will fail!** See [Ubuntu Installation Guide](UBUNTU_INSTALLATION.md) for the complete solution.
+
+**Quick automated install:**
+```bash
+cd /path/to/Conformity
+./scripts/install_opencolorio_ubuntu.sh
+```
+
+**Or manual install with ALL required dependencies:**
+```bash
+# Install build tools
+sudo apt-get update
+sudo apt-get install -y build-essential cmake ninja-build git pkg-config
+
+# Install Python development packages (CRITICAL!)
+sudo apt-get install -y python3-dev python3-pip
+
+# Install OpenColorIO dependencies (ALL required!)
+sudo apt-get install -y \
+    libboost-all-dev \
+    libyaml-cpp-dev \
+    libtinyxml-dev \
+    libglew-dev \
+    zlib1g-dev
+
+# Now build from source
+git clone --depth 1 --branch v2.3.2 https://github.com/AcademySoftwareFoundation/OpenColorIO.git
 cd OpenColorIO
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DOCIO_BUILD_PYTHON=ON ..
-make -j$(nproc)
-sudo make install
+cmake -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DOCIO_BUILD_PYTHON=ON \
+    -DPYTHON_EXECUTABLE=$(which python3) \
+    ..
+ninja -j$(nproc)
+sudo ninja install
+sudo ldconfig
 ```
+
+**Common missing dependencies that cause build failures:**
+- `build-essential` - C/C++ compiler
+- `python3-dev` - Python headers (most common cause of failure!)
+- `libboost-all-dev` - Boost C++ libraries
+- `libyaml-cpp-dev` - YAML parsing
+- `libtinyxml-dev` - XML parsing
+- `libglew-dev` - OpenGL libraries
+
+See [Ubuntu Installation Guide](UBUNTU_INSTALLATION.md) for detailed explanations and troubleshooting.
 
 **Windows:**
 ```powershell
