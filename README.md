@@ -368,10 +368,19 @@ Qt-based user interface widgets:
 👉 **[Ubuntu Installation Guide](docs/UBUNTU_INSTALLATION.md)**
 
 ```bash
-# Quick automated install
+# Quick automated install for OpenColorIO
 cd /path/to/Conformity
 ./scripts/install_opencolorio_ubuntu.sh
 ```
+
+**Getting `GLIBCXX_3.4.32 not found` errors?**
+If you're using miniconda/anaconda Python 3.13, build OTIO from source:
+```bash
+source venv/bin/activate
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+See [Quick Fix Guide](docs/QUICK_FIX_UBUNTU.md) for more solutions.
 
 This handles all dependencies and builds OpenColorIO automatically. For other platforms, continue below.
 

@@ -66,6 +66,35 @@ sudo ldconfig
 
 ## Common Errors and Quick Fixes
 
+### Error: "GLIBCXX_3.4.32 not found" (OpenTimelineIO)
+
+**Symptom:** Tests fail with `ImportError: version 'GLIBCXX_3.4.32' not found`
+
+**Root Cause:** You're using a virtual environment based on miniconda/anaconda Python 3.13, and the pre-built OTIO wheel is linking to miniconda's older libstdc++.
+
+**Fix Option 1 - Build OTIO from Source (Recommended):**
+```bash
+cd /path/to/Conformity
+source venv/bin/activate  # Activate your venv
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+**Fix Option 2 - Set Library Path:**
+```bash
+# Add to your shell profile or run before tests
+source scripts/setup_ubuntu_environment.sh
+```
+
+**Fix Option 3 - Use System Python:**
+```bash
+# Recreate venv with system Python instead of miniconda
+deactivate
+rm -rf venv
+python3 -m venv venv  # Use system Python 3.11
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Error: "Python.h: No such file or directory"
 
 **Missing:** `python3-dev`
