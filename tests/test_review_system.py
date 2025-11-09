@@ -307,13 +307,14 @@ class TestMetadataDisplay:
 
     def test_format_file_size(self):
         """Test file size formatting."""
-        file_size_bytes = 1_500_000_000  # 1.5 GB
+        file_size_bytes = 1_500_000_000  # 1.5 GB (1500 MB)
 
         size_mb = file_size_bytes / (1024 ** 2)
         size_gb = file_size_bytes / (1024 ** 3)
 
         assert size_mb > 1000
-        assert 1.4 < size_gb < 1.5
+        # 1.5 billion bytes is ~1.397 GiB
+        assert 1.3 < size_gb < 1.5
 
     def test_format_duration(self):
         """Test duration formatting."""

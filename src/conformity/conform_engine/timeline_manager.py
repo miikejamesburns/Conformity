@@ -102,9 +102,13 @@ class TimelineManager:
             kind=otio.schema.TrackKind.Video
         )
 
+        # Create empty stack first, then append track to avoid parent issues
+        stack = otio.schema.Stack()
+        stack.append(track)
+
         timeline = otio.schema.Timeline(
             name=name,
-            tracks=otio.schema.Stack(children=[track])
+            tracks=stack
         )
 
         # Set the global start time

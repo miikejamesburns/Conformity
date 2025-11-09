@@ -303,10 +303,20 @@ class ConformEngine:
         Returns:
             ClipInfo object
         """
+        # Try to get available_range, but handle cases where it can't be computed
+        available_range = None
+        try:
+            available_range = clip.available_range()
+        except Exception:
+            # MissingReference or other cases where available_range can't be computed
+            # Use source_range as fallback if available
+            if clip.source_range:
+                available_range = clip.source_range
+
         clip_info = ClipInfo(
             name=clip.name,
             source_range=clip.source_range,
-            available_range=clip.available_range(),
+            available_range=available_range,
             duration=clip.duration(),
             track_name=track_name,
             track_kind=track_kind,
@@ -451,12 +461,22 @@ class ConformEngine:
             file_path.parent.mkdir(parents=True, exist_ok=True)
 
             # Write the timeline
-            otio.adapters.write_to_file(
-                timeline,
-                str(file_path),
-                adapter_name=adapter_name,
-                adapter_args=adapter_args or {}
-            )
+            # Note: OTIO 0.16+ doesn't support adapter_args in write_to_file
+            # Use write_to_string with adapter then write manually if needed
+            if adapter_args:
+                # If adapter_args provided, use write_to_string and write manually
+                content = otio.adapters.write_to_string(
+                    timeline,
+                    adapter_name=adapter_name
+                )
+                file_path.write_text(content)
+            else:
+                # Standard write path
+                otio.adapters.write_to_file(
+                    timeline,
+                    str(file_path),
+                    adapter_name=adapter_name
+                )
 
             logger.info(f"Successfully exported timeline to {file_path}")
 

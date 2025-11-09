@@ -643,6 +643,39 @@ class ProductionDatabase:
         self.conn.commit()
         return self.cursor.rowcount > 0
 
+    def list_reviews(
+        self,
+        shot_id: Optional[int] = None,
+        task_id: Optional[int] = None,
+        department: Optional[str] = None,
+        status: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """List reviews with optional filters."""
+        query = "SELECT * FROM reviews WHERE 1=1"
+        params = []
+
+        if shot_id is not None:
+            query += " AND shot_id = ?"
+            params.append(shot_id)
+
+        if task_id is not None:
+            query += " AND task_id = ?"
+            params.append(task_id)
+
+        if department is not None:
+            query += " AND department = ?"
+            params.append(department)
+
+        if status is not None:
+            query += " AND status = ?"
+            params.append(status)
+
+        query += " ORDER BY created_at DESC"
+
+        self.cursor.execute(query, params)
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+
     # Deliverables management
     def create_deliverable(
         self,
