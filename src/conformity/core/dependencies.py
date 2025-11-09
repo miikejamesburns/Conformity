@@ -46,6 +46,36 @@ class DependencyChecker:
             return (False, str(e))
 
     @staticmethod
+    def check_pyav() -> Tuple[bool, str]:
+        """
+        Check if PyAV is available.
+
+        Returns:
+            Tuple of (is_available, version_or_error_message)
+        """
+        try:
+            import av
+            version = av.__version__
+            return (True, version)
+        except ImportError as e:
+            return (False, str(e))
+
+    @staticmethod
+    def check_openimageio() -> Tuple[bool, str]:
+        """
+        Check if OpenImageIO is available.
+
+        Returns:
+            Tuple of (is_available, version_or_error_message)
+        """
+        try:
+            import OpenImageIO as oiio
+            version = oiio.VERSION_STRING if hasattr(oiio, 'VERSION_STRING') else "unknown"
+            return (True, version)
+        except ImportError as e:
+            return (False, str(e))
+
+    @staticmethod
     def check_opentimelineio() -> Tuple[bool, str]:
         """
         Check if OpenTimelineIO is available.
@@ -101,12 +131,40 @@ class DependencyChecker:
         else:
             deps['PyOpenColorIO']['error'] = info
 
+        deps['PyAV'] = {
+            'required': False,
+            'available': False,
+            'version': None,
+            'error': None,
+            'features': ['Video playback', 'Professional codecs (ProRes, DNxHD)', 'Hardware acceleration']
+        }
+        available, info = checker.check_pyav()
+        deps['PyAV']['available'] = available
+        if available:
+            deps['PyAV']['version'] = info
+        else:
+            deps['PyAV']['error'] = info
+
+        deps['OpenImageIO'] = {
+            'required': False,
+            'available': False,
+            'version': None,
+            'error': None,
+            'features': ['Image sequences (EXR, DPX)', 'High bit-depth', 'VFX formats']
+        }
+        available, info = checker.check_openimageio()
+        deps['OpenImageIO']['available'] = available
+        if available:
+            deps['OpenImageIO']['version'] = info
+        else:
+            deps['OpenImageIO']['error'] = info
+
         deps['tlRender'] = {
             'required': False,
             'available': False,
             'version': None,
             'error': None,
-            'features': ['Professional playback', 'Hardware acceleration', 'Image sequences', 'Professional formats']
+            'features': ['Ultimate playback (when Python bindings available)', 'All formats combined']
         }
         available, info = checker.check_tlrender()
         deps['tlRender']['available'] = available

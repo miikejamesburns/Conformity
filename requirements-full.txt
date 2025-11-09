@@ -8,6 +8,18 @@
 # Package name is 'opencolorio', imports as 'PyOpenColorIO'
 opencolorio>=2.3.0
 
+# Optional: High-performance playback engines
+# NumPy is required for frame processing
+numpy>=1.24.0
+
+# PyAV provides professional video format support via FFmpeg
+av>=10.0.0
+
+# OpenImageIO for image sequence support (EXR, DPX, etc.)
+# Note: May require building from source on some platforms
+# See: https://github.com/OpenImageIO/oiio
+# openimageio>=2.4.0  # Uncomment when available or built
+
 # Optional: tlRender for professional playback
 # Note: tlRender still requires building from source - see docs/BUILDING_OPTIONAL_DEPS.md
 # Uncomment when you have built and installed tlRender:
