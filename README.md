@@ -390,6 +390,39 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+### Optional Dependencies
+
+Conformity includes optional professional features that require additional libraries:
+
+#### Check Dependency Status
+```bash
+python3 -m conformity.core.dependencies
+```
+
+#### PyOpenColorIO (Color Management)
+Enables professional color workflows, LUTs, and ACES pipelines.
+
+**Quick install** (if available):
+```bash
+# macOS
+brew install opencolorio && pip install PyOpenColorIO
+
+# Linux
+sudo apt-get install libopencolorio-dev && pip install PyOpenColorIO
+
+# Conda (all platforms)
+conda install -c conda-forge opencolorio
+```
+
+**Build from source**: See [docs/BUILDING_OPTIONAL_DEPS.md](docs/BUILDING_OPTIONAL_DEPS.md#pyopencolorio)
+
+#### tlRender (Professional Playback)
+Enables hardware-accelerated playback, professional formats (EXR, DPX, ProRes, RED, ARRI), and image sequences.
+
+**Build from source** (required): See [docs/BUILDING_OPTIONAL_DEPS.md](docs/BUILDING_OPTIONAL_DEPS.md#tlrender)
+
+> **Note:** Conformity works without these dependencies - they only enable advanced features. The application will detect and use them automatically if installed.
+
 ## Running the Application
 
 ### Quick Start

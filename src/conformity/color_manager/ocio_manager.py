@@ -3,14 +3,25 @@ OpenColorIO (OCIO) integration for color management.
 
 This module provides interfaces for working with OCIO configurations,
 color spaces, and color transformations.
+
+Note: PyOpenColorIO is optional. If not installed, a stub manager
+will be provided that raises helpful errors.
 """
 
-import PyOpenColorIO as ocio
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from ..core.logger import get_logger
 
 logger = get_logger(__name__)
+
+# Check for PyOpenColorIO availability
+try:
+    import PyOpenColorIO as ocio
+    HAS_OCIO = True
+except ImportError:
+    HAS_OCIO = False
+    ocio = None
+    logger.info("PyOpenColorIO not available - color management features will be disabled")
 
 
 class OCIOManager:
@@ -23,8 +34,21 @@ class OCIOManager:
         Args:
             config_path: Optional path to OCIO config file.
                         If not provided, will use $OCIO environment variable.
+
+        Raises:
+            ImportError: If PyOpenColorIO is not installed
         """
-        self._config: Optional[ocio.Config] = None
+        if not HAS_OCIO:
+            raise ImportError(
+                "PyOpenColorIO is not installed. Color management features are disabled.\n\n"
+                "To enable color management:\n"
+                "1. Build PyOpenColorIO from source (recommended):\n"
+                "   - macOS: brew install opencolorio && pip install PyOpenColorIO\n"
+                "   - Linux: sudo apt-get install libopencolorio-dev && pip install PyOpenColorIO\n"
+                "2. Or use your forked version - see DEPLOYMENT_GUIDE.md\n"
+            )
+
+        self._config = None
         self._config_path = config_path
         logger.info("OCIOManager initialized")
 
@@ -39,7 +63,7 @@ class OCIOManager:
         import os
         return 'OCIO' in os.environ
 
-    def load_config(self, config_path: Optional[Path] = None) -> ocio.Config:
+    def load_config(self, config_path: Optional[Path] = None) -> Any:
         """
         Load an OCIO configuration.
 
@@ -71,7 +95,7 @@ class OCIOManager:
             logger.error(f"Failed to load OCIO config: {e}")
             raise ValueError(f"Could not load OCIO config: {e}")
 
-    def get_config(self) -> Optional[ocio.Config]:
+    def get_config(self) -> Optional[Any]:
         """Get the current OCIO configuration."""
         return self._config
 
@@ -167,7 +191,7 @@ class OCIOManager:
         self,
         src_color_space: str,
         dst_color_space: str
-    ) -> Optional[ocio.Processor]:
+    ) -> Optional[Any]:
         """
         Create a color transformation processor.
 
