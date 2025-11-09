@@ -615,7 +615,7 @@ def validate_edl_file(file_path: Path) -> Tuple[bool, List[str]]:
         if len(event_nums) != len(set(event_nums)):
             errors.append("Duplicate event numbers found")
 
-        # Validate timecodes
+        # Validate timecodes and check durations
         for event in edl_info.events:
             try:
                 # Check format
@@ -627,6 +627,18 @@ def validate_edl_file(file_path: Path) -> Tuple[bool, List[str]]:
                     errors.append(
                         f"Event {event.event_number}: Invalid source out timecode"
                     )
+
+                # Check for duration mismatches
+                src_frames = _tc_to_frames(event.source_out) - _tc_to_frames(event.source_in)
+                rec_frames = _tc_to_frames(event.record_out) - _tc_to_frames(event.record_in)
+
+                if src_frames != rec_frames:
+                    errors.append(
+                        f"Event {event.event_number} ({event.clip_name or event.reel_name}): "
+                        f"Duration mismatch - Source: {src_frames}f, Record: {rec_frames}f "
+                        f"(difference: {abs(src_frames - rec_frames)}f)"
+                    )
+
             except Exception as e:
                 errors.append(
                     f"Event {event.event_number}: Timecode validation error: {e}"
@@ -636,3 +648,130 @@ def validate_edl_file(file_path: Path) -> Tuple[bool, List[str]]:
         errors.append(f"Failed to parse EDL: {e}")
 
     return (len(errors) == 0, errors)
+
+
+def _tc_to_frames(tc_str: str, fps: int = 24) -> int:
+    """
+    Convert timecode string to frame count.
+
+    Args:
+        tc_str: Timecode string (HH:MM:SS:FF)
+        fps: Frames per second (default: 24)
+
+    Returns:
+        Total frame count
+    """
+    try:
+        parts = tc_str.split(':')
+        if len(parts) != 4:
+            return 0
+        hours, minutes, seconds, frames = map(int, parts)
+        return (hours * 3600 + minutes * 60 + seconds) * fps + frames
+    except:
+        return 0
+
+
+def analyze_edl_duration_issues(file_path: Path) -> Dict[str, Any]:
+    """
+    Analyze an EDL file for duration mismatch issues.
+
+    This is helpful for diagnosing OTIO import failures caused by
+    source/record duration mismatches.
+
+    Args:
+        file_path: Path to EDL file
+
+    Returns:
+        Dictionary containing:
+            - total_events: Total number of events
+            - issues: List of events with duration mismatches
+            - suggestions: List of recommendations
+    """
+    logger.info(f"Analyzing EDL for duration issues: {file_path}")
+
+    result = {
+        "file": str(file_path),
+        "total_events": 0,
+        "issues": [],
+        "suggestions": []
+    }
+
+    try:
+        parser = EDLParser()
+        edl_info = parser.parse_file(file_path)
+        result["total_events"] = len(edl_info.events)
+
+        # Check each event for duration mismatches
+        for event in edl_info.events:
+            src_frames = _tc_to_frames(event.source_out) - _tc_to_frames(event.source_in)
+            rec_frames = _tc_to_frames(event.record_out) - _tc_to_frames(event.record_in)
+
+            if src_frames != rec_frames:
+                result["issues"].append({
+                    "event_number": event.event_number,
+                    "clip_name": event.clip_name or event.reel_name,
+                    "source_duration": src_frames,
+                    "record_duration": rec_frames,
+                    "difference": abs(src_frames - rec_frames),
+                    "source_in": event.source_in,
+                    "source_out": event.source_out,
+                    "record_in": event.record_in,
+                    "record_out": event.record_out
+                })
+
+        # Generate suggestions
+        if result["issues"]:
+            result["suggestions"] = [
+                "Re-export the EDL from your NLE without handles or additional frames",
+                "Check if any clips have speed changes or freeze frames applied",
+                "Try exporting as AAF or FCP XML instead (more robust formats)",
+                "Manually edit the EDL to match source and record durations",
+                "Check your NLE's EDL export settings for compatibility mode"
+            ]
+
+    except Exception as e:
+        logger.error(f"Error analyzing EDL: {e}")
+        result["error"] = str(e)
+
+    return result
+
+
+def print_edl_analysis(analysis: Dict[str, Any]) -> None:
+    """
+    Print a formatted EDL analysis report.
+
+    Args:
+        analysis: Analysis results from analyze_edl_duration_issues()
+    """
+    print("=" * 70)
+    print("EDL DURATION ANALYSIS REPORT")
+    print("=" * 70)
+
+    if "error" in analysis:
+        print(f"\nERROR: {analysis['error']}")
+        return
+
+    print(f"\nFile: {analysis['file']}")
+    print(f"Total Events: {analysis['total_events']}")
+    print(f"Issues Found: {len(analysis['issues'])}")
+
+    if analysis['issues']:
+        print("\nDURATION MISMATCHES:")
+        print("-" * 70)
+        for issue in analysis['issues']:
+            print(f"\nEvent {issue['event_number']}: {issue['clip_name']}")
+            print(f"  Source Duration:  {issue['source_duration']} frames")
+            print(f"  Record Duration:  {issue['record_duration']} frames")
+            print(f"  Difference:       {issue['difference']} frames")
+            print(f"  Source: {issue['source_in']} -> {issue['source_out']}")
+            print(f"  Record: {issue['record_in']} -> {issue['record_out']}")
+
+        print("\nRECOMMENDATIONS:")
+        print("-" * 70)
+        for i, suggestion in enumerate(analysis['suggestions'], 1):
+            print(f"  {i}. {suggestion}")
+
+    else:
+        print("\n✓ No duration mismatch issues found!")
+
+    print("=" * 70)

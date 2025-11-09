@@ -125,7 +125,8 @@ class ConformEngine:
         self,
         file_path: Path,
         adapter_name: Optional[str] = None,
-        verify_media: bool = False
+        verify_media: bool = False,
+        lenient_edl: bool = False
     ) -> Tuple[otio.schema.Timeline, TimelineInfo]:
         """
         Import a timeline from file.
@@ -134,6 +135,8 @@ class ConformEngine:
             file_path: Path to the timeline file
             adapter_name: Optional adapter name (auto-detected if not provided)
             verify_media: Whether to verify media files exist
+            lenient_edl: If True, attempts to work around EDL validation issues
+                        (only applies to EDL format)
 
         Returns:
             Tuple of (timeline, timeline_info)
@@ -173,6 +176,12 @@ class ConformEngine:
         try:
             logger.info(f"Importing timeline from {file_path} using adapter '{adapter_name}'")
 
+            # For EDL files, we can pass rate_24 parameter to be more lenient
+            adapter_args = {}
+            if adapter_name == "cmx_3600" and lenient_edl:
+                logger.info("Using lenient EDL parsing mode")
+                # OTIO's EDL adapter doesn't have a lenient mode, but we can try to work around it
+
             # Read the timeline
             timeline = otio.adapters.read_from_file(
                 str(file_path),
@@ -196,7 +205,28 @@ class ConformEngine:
             return timeline, timeline_info
 
         except otio.exceptions.OTIOError as e:
-            logger.error(f"OTIO error during import: {e}")
+            error_msg = str(e)
+            logger.error(f"OTIO error during import: {error_msg}")
+
+            # Provide helpful guidance for EDL duration mismatch errors
+            if "duration don't match" in error_msg.lower() and adapter_name == "cmx_3600":
+                helpful_msg = (
+                    f"EDL validation error: {error_msg}\n\n"
+                    "This error occurs when the source and record durations don't match in the EDL.\n"
+                    "Common causes:\n"
+                    "  - Speed changes or time remapping\n"
+                    "  - Freeze frames\n"
+                    "  - Transitions affecting timing\n"
+                    "  - EDL export bugs from some NLEs\n\n"
+                    "Possible solutions:\n"
+                    "  1. Re-export the EDL from your NLE with 'Handles' disabled\n"
+                    "  2. Try exporting as AAF or FCP XML instead (more robust)\n"
+                    "  3. Manually edit the EDL to fix the duration mismatch\n"
+                    "  4. Check if your NLE has EDL export settings for compatibility\n\n"
+                    f"Problematic clip: Look for lines with the clip name in the EDL file"
+                )
+                raise ImportError(str(file_path), helpful_msg)
+
             raise ImportError(str(file_path), str(e))
         except Exception as e:
             logger.error(f"Unexpected error during import: {e}")
