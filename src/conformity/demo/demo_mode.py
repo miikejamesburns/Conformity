@@ -380,16 +380,19 @@ class DemoProject:
                         shot_id = shot['id']
                         break
 
-            self.production_tracker.db.create_task(
+            task_id = self.production_tracker.db.create_task(
                 title=task_data['title'],
                 department=task_data['department'],
                 shot_id=shot_id,
                 project_id=self.project_id if not shot_id else None,
                 priority=task_data['priority'],
-                status=task_data['status'],
                 estimated_hours=task_data['estimated_hours'],
                 due_date=(datetime.now() + timedelta(days=random.randint(7, 30))).strftime('%Y-%m-%d')
             )
+
+            # Update task status
+            if 'status' in task_data:
+                self.production_tracker.db.update_task_status(task_id, task_data['status'])
 
     def _add_demo_deliverables(self):
         """Add demo deliverables."""
