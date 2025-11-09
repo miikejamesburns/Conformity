@@ -101,9 +101,12 @@ class ConformEngine:
             for adapter in manifest.adapters:
                 # Adapter object has a .name attribute
                 adapters.append(adapter.name)
+            logger.debug(f"Detected {len(adapters)} OTIO adapters")
             return adapters
         except Exception as e:
-            logger.warning(f"Failed to detect adapters: {e}")
+            logger.error(f"Failed to detect OTIO adapters: {e}")
+            logger.error("This usually means OpenTimelineIO is not installed or not working properly")
+            logger.error("Install it with: pip install opentimelineio==0.16.0")
             return []
 
     def is_adapter_available(self, adapter_name: str) -> bool:
@@ -153,7 +156,19 @@ class ConformEngine:
 
         # Check adapter availability
         if not self.is_adapter_available(adapter_name):
-            raise AdapterNotFoundError(adapter_name)
+            # Provide helpful context about available adapters
+            if not self._supported_adapters:
+                logger.error("No OTIO adapters detected. OpenTimelineIO may not be installed.")
+                raise AdapterNotFoundError(
+                    adapter_name +
+                    " (No adapters available - is OpenTimelineIO installed?)"
+                )
+            else:
+                logger.error(
+                    f"Adapter '{adapter_name}' not available. "
+                    f"Available adapters: {', '.join(self._supported_adapters)}"
+                )
+                raise AdapterNotFoundError(adapter_name)
 
         try:
             logger.info(f"Importing timeline from {file_path} using adapter '{adapter_name}'")
@@ -415,7 +430,19 @@ class ConformEngine:
 
         # Check adapter availability
         if not self.is_adapter_available(adapter_name):
-            raise AdapterNotFoundError(adapter_name)
+            # Provide helpful context about available adapters
+            if not self._supported_adapters:
+                logger.error("No OTIO adapters detected. OpenTimelineIO may not be installed.")
+                raise AdapterNotFoundError(
+                    adapter_name +
+                    " (No adapters available - is OpenTimelineIO installed?)"
+                )
+            else:
+                logger.error(
+                    f"Adapter '{adapter_name}' not available. "
+                    f"Available adapters: {', '.join(self._supported_adapters)}"
+                )
+                raise AdapterNotFoundError(adapter_name)
 
         try:
             logger.info(f"Exporting timeline to {file_path} using adapter '{adapter_name}'")
