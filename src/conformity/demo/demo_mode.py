@@ -20,7 +20,7 @@ import random
 from ..asset_tracker.asset_database import AssetDatabase, AssetType, AssetStatus
 from ..production_tracker.shot_tracker import ShotTracker
 from ..production_tracker.production_database import (
-    Department, VFXComplexity, TaskPriority, TaskStatus
+    Department, VFXComplexity, TaskPriority, TaskStatus, ShotStatus
 )
 
 
@@ -252,32 +252,32 @@ class DemoProject:
                 'desc': 'Wide establishing beach',
                 'complexity': VFXComplexity.SIMPLE,
                 'duration': 120,
-                'vfx_status': 'approved',
-                'color_status': 'approved'
+                'vfx_status': ShotStatus.APPROVED,
+                'color_status': ShotStatus.APPROVED
             },
             {
                 'name': '010_020',
                 'desc': 'Medium actor walking',
                 'complexity': VFXComplexity.MEDIUM,
                 'duration': 96,
-                'vfx_status': 'review',
-                'color_status': 'in_progress'
+                'vfx_status': ShotStatus.REVIEW,
+                'color_status': ShotStatus.IN_PROGRESS
             },
             {
                 'name': '010_030',
                 'desc': 'Close-up dramatic reveal',
                 'complexity': VFXComplexity.COMPLEX,
                 'duration': 144,
-                'vfx_status': 'revision',
-                'color_status': 'not_started'
+                'vfx_status': ShotStatus.REVISION,
+                'color_status': ShotStatus.NOT_STARTED
             },
             {
                 'name': '010_040',
                 'desc': 'Insert waves crashing',
                 'complexity': VFXComplexity.SIMPLE,
                 'duration': 72,
-                'vfx_status': 'approved',
-                'color_status': 'approved'
+                'vfx_status': ShotStatus.APPROVED,
+                'color_status': ShotStatus.APPROVED
             }
         ]
 
