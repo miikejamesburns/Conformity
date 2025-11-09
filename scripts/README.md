@@ -57,6 +57,57 @@ cd /path/to/Conformity
 
 ---
 
+### `install_opentimelineio_ubuntu.sh`
+
+**Build OpenTimelineIO from source** - fixes GLIBCXX version conflicts with miniconda/anaconda.
+
+**What it does:**
+1. Installs build dependencies (build-essential, cmake, pybind11-dev)
+2. Clones OpenTimelineIO v0.16.0 from source
+3. Builds with system compiler (avoids library version conflicts)
+4. Installs into current Python environment
+5. Verifies installation and adapters
+
+**Usage:**
+```bash
+cd /path/to/Conformity
+source venv/bin/activate  # Activate your virtual environment
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+**Time:** ~5-10 minutes
+
+**Use this if:**
+- ✅ You're getting `GLIBCXX_3.4.32 not found` errors
+- ✅ You're using miniconda/anaconda Python
+- ✅ The pre-built OTIO wheel isn't working
+- ✅ You're using Python 3.13
+
+---
+
+### `setup_ubuntu_environment.sh`
+
+**Environment setup** - fixes library path issues with miniconda and system libraries.
+
+**What it does:**
+1. Prioritizes system libstdc++ over miniconda's version
+2. Sets LD_LIBRARY_PATH to use system libraries first
+3. Warns about potential version conflicts
+4. Displays available GLIBCXX versions
+
+**Usage:**
+```bash
+# Run before tests or add to shell profile
+source scripts/setup_ubuntu_environment.sh
+```
+
+**Use this if:**
+- ✅ You're getting library version errors
+- ✅ You want to use pre-built wheels with miniconda
+- ✅ You don't want to rebuild from source
+
+---
+
 ## Which Script Should I Use?
 
 ### Use `install_opencolorio_ubuntu.sh` if:
