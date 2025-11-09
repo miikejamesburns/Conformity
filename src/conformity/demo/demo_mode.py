@@ -432,11 +432,22 @@ class DemoProject:
         ]
 
         for deliv_data in deliverables:
-            self.production_tracker.db.create_deliverable(
+            # Extract status separately as it's not part of create_deliverable params
+            status = deliv_data.pop('status', 'not_started')
+
+            # Create the deliverable
+            deliv_id = self.production_tracker.db.create_deliverable(
                 project_id=self.project_id,
                 due_date=(datetime.now() + timedelta(days=random.randint(30, 90))).strftime('%Y-%m-%d'),
                 **deliv_data
             )
+
+            # Update the status if it's not the default
+            if status != 'not_started':
+                self.production_tracker.db.update_deliverable_status(
+                    deliverable_id=deliv_id,
+                    status=status
+                )
 
     def _add_demo_team(self):
         """Add demo team members."""
