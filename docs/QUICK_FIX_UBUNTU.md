@@ -209,6 +209,17 @@ source venv/bin/activate  # If using venv
 
 This installs from Ubuntu repositories and creates a symlink in your venv.
 
+**If you get GLIBCXX errors with OpenImageIO:**
+
+Same issue as OTIO - miniconda's old libstdc++. Fix:
+```bash
+# Before using OpenImageIO, run:
+source scripts/setup_ubuntu_environment.sh
+
+# Or add to ~/.bashrc for permanent fix:
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+```
+
 **Manual Install:**
 ```bash
 sudo apt-get install python3-openimageio

@@ -44,8 +44,18 @@ echo "  1. Install OpenImageIO from Ubuntu repositories"
 echo "  2. Install Python bindings (python3-openimageio)"
 if [ -n "$VENV_PATH" ]; then
     echo "  3. Create symlink in your venv to access the package"
+    echo "  4. Set up library paths (if using miniconda/anaconda)"
 fi
 echo ""
+
+# Check if using miniconda/anaconda
+USING_CONDA=false
+if command -v conda &> /dev/null || [[ "$PATH" == *"miniconda"* ]] || [[ "$PATH" == *"anaconda"* ]]; then
+    USING_CONDA=true
+    echo -e "${YELLOW}Note: Detected conda/miniconda in your environment.${NC}"
+    echo "If you encounter GLIBCXX errors, we'll configure library paths automatically."
+    echo ""
+fi
 
 read -p "Continue? (y/n) " -n 1 -r
 echo
@@ -131,42 +141,72 @@ if [ -n "$VENV_PATH" ]; then
 fi
 
 # Verify installation
-if $PYTHON_CMD -c "import OpenImageIO as oiio; print(f'OpenImageIO version: {oiio.VERSION_STRING}')" 2>/dev/null; then
+IMPORT_ERROR=$($PYTHON_CMD -c "import OpenImageIO as oiio; print(f'OpenImageIO version: {oiio.VERSION_STRING}')" 2>&1)
+IMPORT_STATUS=$?
+
+if [ $IMPORT_STATUS -eq 0 ]; then
     echo ""
     echo -e "${GREEN}=======================================================================${NC}"
     echo -e "${GREEN}✓ Installation completed successfully!${NC}"
     echo -e "${GREEN}=======================================================================${NC}"
     echo ""
-    $PYTHON_CMD -c "import OpenImageIO as oiio; print(f'OpenImageIO version: {oiio.VERSION_STRING}')"
+    echo "$IMPORT_ERROR"
     echo ""
     echo "Supported formats:"
     $PYTHON_CMD -c "import OpenImageIO as oiio; print(', '.join(oiio.get_string_attribute('extension_list').split(';')[:10]) + '...')" 2>/dev/null || echo "EXR, DPX, TIFF, PNG, JPEG, and many more"
     echo ""
 else
-    echo ""
-    echo -e "${RED}=======================================================================${NC}"
-    echo -e "${RED}✗ Installation verification failed${NC}"
-    echo -e "${RED}=======================================================================${NC}"
-    echo ""
-    echo "Troubleshooting:"
-    echo "  1. Check if package is installed:"
-    echo "     dpkg -l | grep openimageio"
-    echo ""
-    echo "  2. Find the .so file:"
-    echo "     find /usr/lib -name 'OpenImageIO*.so'"
-    echo ""
-    echo "  3. Try importing in system Python:"
-    echo "     python3 -c 'import OpenImageIO; print(OpenImageIO.VERSION_STRING)'"
-    echo ""
-
-    if [ -n "$VENV_PATH" ]; then
-        echo "  4. If system Python works, manually create symlink:"
-        echo "     SYSTEM_SO=\$(find /usr/lib -name 'OpenImageIO.so' -o -name 'OpenImageIO.cpython*.so' | head -1)"
-        echo "     ln -s \$SYSTEM_SO $VENV_SITE_PACKAGES/"
+    # Check if it's a GLIBCXX error
+    if echo "$IMPORT_ERROR" | grep -q "GLIBCXX"; then
         echo ""
-    fi
+        echo -e "${YELLOW}=======================================================================${NC}"
+        echo -e "${YELLOW}⚠ GLIBCXX Library Version Issue Detected${NC}"
+        echo -e "${YELLOW}=======================================================================${NC}"
+        echo ""
+        echo "The package is installed but requires a newer libstdc++ than what"
+        echo "miniconda/anaconda provides."
+        echo ""
+        echo -e "${GREEN}SOLUTION: Set up environment to use system libraries${NC}"
+        echo ""
+        echo "Run this before using OpenImageIO:"
+        echo "  ${BLUE}source scripts/setup_ubuntu_environment.sh${NC}"
+        echo ""
+        echo "Or add to your shell profile (~/.bashrc) for permanent fix:"
+        echo "  ${BLUE}export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:\$LD_LIBRARY_PATH${NC}"
+        echo ""
+        echo "Then verify:"
+        echo "  python -c 'import OpenImageIO as oiio; print(oiio.VERSION_STRING)'"
+        echo ""
+        exit 0  # Not a failure, just needs env setup
+    else
+        echo ""
+        echo -e "${RED}=======================================================================${NC}"
+        echo -e "${RED}✗ Installation verification failed${NC}"
+        echo -e "${RED}=======================================================================${NC}"
+        echo ""
+        echo "Error:"
+        echo "$IMPORT_ERROR"
+        echo ""
+        echo "Troubleshooting:"
+        echo "  1. Check if package is installed:"
+        echo "     dpkg -l | grep openimageio"
+        echo ""
+        echo "  2. Find the .so file:"
+        echo "     find /usr/lib -name 'OpenImageIO*.so'"
+        echo ""
+        echo "  3. Try importing in system Python:"
+        echo "     python3 -c 'import OpenImageIO; print(OpenImageIO.VERSION_STRING)'"
+        echo ""
 
-    exit 1
+        if [ -n "$VENV_PATH" ]; then
+            echo "  4. If system Python works, manually create symlink:"
+            echo "     SYSTEM_SO=\$(find /usr/lib -name 'OpenImageIO.so' -o -name 'OpenImageIO.cpython*.so' | head -1)"
+            echo "     ln -s \$SYSTEM_SO $VENV_SITE_PACKAGES/"
+            echo ""
+        fi
+
+        exit 1
+    fi
 fi
 
 echo "Next steps:"
