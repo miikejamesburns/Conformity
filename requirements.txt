@@ -1,7 +1,12 @@
 # Core Timeline and Color Management
 # Note: OTIO 0.16.0 is required for FCP XML adapter support. Version 0.17+ removes some adapters.
 opentimelineio==0.16.0
-# PyOpenColorIO>=2.3.0  # OPTIONAL - Commented out (see requirements-optional.txt for installation)
+
+# Optional: PyOpenColorIO for color management
+# Now available on PyPI with pre-built wheels!
+# Package name is 'opencolorio', imports as 'PyOpenColorIO'
+# Uncomment to enable color management features:
+# opencolorio>=2.3.0
 
 # UI Framework
 PyQt6>=6.6.0

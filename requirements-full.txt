@@ -1,0 +1,14 @@
+# Full requirements including optional dependencies
+# Use this file to install Conformity with all professional features enabled
+
+# Include core requirements
+-r requirements.txt
+
+# Optional: PyOpenColorIO for color management (now has wheels on PyPI!)
+# Package name is 'opencolorio', imports as 'PyOpenColorIO'
+opencolorio>=2.3.0
+
+# Optional: tlRender for professional playback
+# Note: tlRender still requires building from source - see docs/BUILDING_OPTIONAL_DEPS.md
+# Uncomment when you have built and installed tlRender:
+# tlrender-python
