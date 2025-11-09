@@ -108,6 +108,38 @@ source scripts/setup_ubuntu_environment.sh
 
 ---
 
+### `install_openimageio_ubuntu.sh`
+
+**Install OpenImageIO** - adds support for professional image formats (EXR, DPX, etc.)
+
+**What it does:**
+1. Installs OpenImageIO from Ubuntu repositories
+2. Installs Python bindings (python3-openimageio)
+3. Creates symlink in venv (if using virtual environment)
+4. Verifies installation
+
+**Usage:**
+```bash
+cd /path/to/Conformity
+source venv/bin/activate  # If using venv
+./scripts/install_openimageio_ubuntu.sh
+```
+
+**Time:** ~2 minutes
+
+**Use this if:**
+- ✅ You need image sequence support (EXR, DPX, TIFF)
+- ✅ You're working with VFX formats
+- ✅ You need high bit-depth image processing
+
+**Enables:**
+- OpenEXR (.exr) - VFX standard, HDR
+- DPX (.dpx) - Film/cinema workflows
+- TIFF, PNG, JPEG - Standard formats
+- Many more professional formats
+
+---
+
 ## Which Script Should I Use?
 
 ### Use `install_opencolorio_ubuntu.sh` if:

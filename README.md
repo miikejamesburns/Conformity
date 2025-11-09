@@ -371,6 +371,10 @@ Qt-based user interface widgets:
 # Quick automated install for OpenColorIO
 cd /path/to/Conformity
 ./scripts/install_opencolorio_ubuntu.sh
+
+# Optional: Install OpenImageIO for image sequences (EXR, DPX)
+source venv/bin/activate  # If using venv
+./scripts/install_openimageio_ubuntu.sh
 ```
 
 **Getting `GLIBCXX_3.4.32 not found` errors?**

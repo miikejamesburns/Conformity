@@ -196,6 +196,31 @@ If it works, you're done! If not, use Option 1.
 
 ---
 
+## Installing OpenImageIO (Optional)
+
+OpenImageIO provides support for professional image formats (EXR, DPX, etc.).
+
+**Quick Install:**
+```bash
+cd /path/to/Conformity
+source venv/bin/activate  # If using venv
+./scripts/install_openimageio_ubuntu.sh
+```
+
+This installs from Ubuntu repositories and creates a symlink in your venv.
+
+**Manual Install:**
+```bash
+sudo apt-get install python3-openimageio
+
+# If using venv, create symlink:
+PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d. -f1,2)
+SYSTEM_OIIO=$(find /usr/lib -name 'OpenImageIO*.so' | head -1)
+ln -s $SYSTEM_OIIO $VIRTUAL_ENV/lib/python${PYTHON_VERSION}/site-packages/
+```
+
+---
+
 ## Verify It Works
 
 After installation:
