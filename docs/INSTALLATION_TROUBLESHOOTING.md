@@ -171,6 +171,86 @@ python -c "import PyOpenColorIO as ocio; print(f'OCIO version: {ocio.__version__
 # OCIO version: 2.3.0
 ```
 
+---
+
+## GLIBCXX Library Version Errors (conda/miniconda)
+
+### Issue: "GLIBCXX_3.4.32 not found"
+
+**Error Message:**
+```python
+ImportError: /home/user/miniconda3/lib/libstdc++.so.6: version `GLIBCXX_3.4.32' not found
+```
+
+**Why this happens:**
+If you're using conda or miniconda Python (especially Python 3.13), the conda-provided libstdc++ library is older and lacks GLIBCXX_3.4.32, which is required by:
+- OpenTimelineIO (pre-built wheels)
+- OpenImageIO (system packages on Ubuntu)
+- Any packages built with newer GCC compilers
+
+**Affects:** Ubuntu/Linux users with conda/miniconda installations
+
+### Solution 1: Use System Python (Recommended - Permanent Fix)
+
+Create your virtual environment with system Python instead of conda Python:
+
+```bash
+cd /path/to/Conformity
+
+# Use automated script:
+./scripts/create_system_venv.sh
+
+# Follow prompts, then:
+source venv/bin/activate
+pip install -r requirements.txt
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+**Why this works:** System Python 3.11 uses the system's libstdc++ which has all required GLIBCXX versions.
+
+### Solution 2: Fix Library Paths (Workaround)
+
+If you want to keep using conda Python, configure the environment to use system libraries:
+
+```bash
+# Before each session:
+source venv/bin/activate
+source scripts/setup_ubuntu_environment.sh
+
+# Or add to ~/.bashrc for permanent fix:
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+```
+
+### Solution 3: Build from Source
+
+Build affected packages from source instead of using pre-built wheels:
+
+```bash
+# For OpenTimelineIO:
+./scripts/install_opentimelineio_ubuntu.sh
+
+# This builds with system compiler, avoiding library conflicts
+```
+
+### Verifying the Fix
+
+After applying the fix:
+
+```bash
+# Test OTIO:
+python -c "import opentimelineio as otio; print(f'OTIO {otio.__version__}')"
+
+# Test OpenImageIO (if installed):
+python -c "import OpenImageIO as oiio; print(f'OIIO {oiio.VERSION_STRING}')"
+
+# Check all dependencies:
+python -m conformity.core.dependencies
+```
+
+For more details, see [Quick Fix Guide](QUICK_FIX_UBUNTU.md).
+
+---
+
 ## Other Common Issues
 
 ### Issue: Qt Platform Plugin Error

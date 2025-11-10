@@ -13,12 +13,38 @@ Complete Ubuntu/Debian installation support for OpenColorIO and Conformity, incl
    - Handles dependencies, build, and verification
    - ~10-15 minute complete setup
 
-2. **`scripts/setup_ubuntu_dependencies.sh`**
+2. **`scripts/install_opentimelineio_ubuntu.sh`**
+   - Build OpenTimelineIO from source
+   - Fixes GLIBCXX library version conflicts with conda/miniconda
+   - ~5-10 minute build and install
+
+3. **`scripts/install_openimageio_ubuntu.sh`**
+   - Install OpenImageIO from Ubuntu repositories
+   - Creates venv symlinks automatically
+   - Detects and guides through GLIBCXX issues
+   - ~2 minute install
+
+4. **`scripts/create_system_venv.sh`**
+   - Create virtual environment with system Python (not conda)
+   - Eliminates GLIBCXX library conflicts permanently
+   - Best solution for conda/miniconda users
+   - ~1 minute setup
+
+5. **`scripts/setup_ubuntu_environment.sh`**
+   - Configure library paths to fix GLIBCXX errors
+   - Prioritizes system libstdc++ over conda's version
+   - Source before running if using conda Python
+
+6. **`scripts/setup_ubuntu_dependencies.sh`**
    - Installs only system dependencies
    - For users who want to build manually
    - ~2-3 minute setup
 
-3. **`scripts/README.md`**
+7. **`scripts/debug_openimageio.sh`**
+   - Diagnostic tool for OpenImageIO installation issues
+   - Comprehensive troubleshooting information
+
+8. **`scripts/README.md`**
    - Documentation for all installation scripts
    - Usage instructions and troubleshooting
 
@@ -54,9 +80,9 @@ Complete Ubuntu/Debian installation support for OpenColorIO and Conformity, incl
    - Links to Ubuntu-specific guide
    - Prominent placement in Installation section
 
-## Problem Solved
+## Problems Solved
 
-### The Issue
+### Issue 1: Missing Dependencies for OpenColorIO
 
 Ubuntu users were encountering build failures when trying to install OpenColorIO because:
 
@@ -74,15 +100,64 @@ Ubuntu users were encountering build failures when trying to install OpenColorIO
 
 3. **No clear path forward** - Users had to Google each error individually
 
+### Issue 2: GLIBCXX Library Version Conflicts (conda/miniconda)
+
+Users with conda/miniconda Python were encountering runtime errors:
+
+1. **GLIBCXX_3.4.32 not found** - Pre-built wheels for OTIO require:
+   ```python
+   ImportError: version `GLIBCXX_3.4.32' not found
+   ```
+
+2. **Root cause** - Conda Python 3.13 ships with older libstdc++ that lacks required GLIBCXX versions
+
+3. **Affects multiple packages**:
+   - OpenTimelineIO (pre-built wheels)
+   - OpenImageIO (system packages)
+   - Any package built with newer gcc
+
+### Issue 3: OpenImageIO Installation Complexity
+
+OpenImageIO isn't available via pip and building from source is complex:
+
+1. **Many build dependencies** - Requires Boost, OpenEXR, LibTIFF, and more
+2. **Virtual environment compatibility** - System packages don't auto-link to venv
+3. **Version mismatches** - Different Ubuntu versions have different OIIO versions
+
 ### The Solution
 
-#### For Users Who Just Want It To Work:
+#### For OpenColorIO Installation:
 
 ```bash
 ./scripts/install_opencolorio_ubuntu.sh
 ```
 
 One command, fully automated, verified working.
+
+#### For GLIBCXX Errors (conda/miniconda):
+
+**Best solution** - Use system Python:
+```bash
+./scripts/create_system_venv.sh
+```
+
+**Alternative** - Fix library paths:
+```bash
+source scripts/setup_ubuntu_environment.sh
+```
+
+**Or** - Build OTIO from source:
+```bash
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+#### For OpenImageIO Installation:
+
+```bash
+./scripts/install_openimageio_ubuntu.sh
+```
+
+Installs from Ubuntu repos, handles venv symlinks, detects GLIBCXX issues.
 
 #### For Users Who Want Control:
 
@@ -96,6 +171,7 @@ One command, fully automated, verified working.
 - Quick reference in `docs/QUICK_FIX_UBUNTU.md`
 - Error-to-solution mapping
 - Copy-paste fixes
+- GLIBCXX troubleshooting
 
 ## Missing Dependencies Identified
 

@@ -189,6 +189,77 @@ python3 run_tests.py --quick
 
 ---
 
+## Additional Optional Dependencies
+
+### OpenTimelineIO (Required - Core Dependency)
+
+OpenTimelineIO is installed via pip in requirements.txt. However, if you're using conda/miniconda Python, you may encounter GLIBCXX library errors. Build from source instead:
+
+```bash
+cd /path/to/Conformity
+source venv/bin/activate
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+### OpenImageIO (Optional - Image Sequence Support)
+
+For professional image format support (EXR, DPX, TIFF):
+
+```bash
+cd /path/to/Conformity
+source venv/bin/activate
+./scripts/install_openimageio_ubuntu.sh
+```
+
+This provides support for:
+- OpenEXR (.exr) - VFX standard, high dynamic range
+- DPX (.dpx) - Film and cinema workflows
+- TIFF, PNG, JPEG - Standard image formats
+
+---
+
+## Special Considerations for conda/miniconda Users
+
+**⚠️ Important:** If you have conda or miniconda installed, you may encounter GLIBCXX_3.4.32 library version conflicts.
+
+### Recommended Solution: Use System Python
+
+The best approach is to create your virtual environment with system Python instead of conda's Python:
+
+```bash
+cd /path/to/Conformity
+
+# Use the automated script:
+./scripts/create_system_venv.sh
+
+# Then install dependencies:
+source venv/bin/activate
+pip install -r requirements.txt
+./scripts/install_opentimelineio_ubuntu.sh
+```
+
+### Alternative: Fix Library Paths
+
+If you prefer to keep using conda Python, set up the environment before each session:
+
+```bash
+source venv/bin/activate
+source scripts/setup_ubuntu_environment.sh
+```
+
+Or add to your `~/.bashrc` for a permanent fix:
+```bash
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+```
+
+### Why This Happens
+
+Conda Python 3.13 ships with an older libstdc++ that lacks GLIBCXX_3.4.32, which is required by pre-built wheels for OTIO and system packages like OpenImageIO. System Python 3.11 uses the system's libstdc++ which has all required versions.
+
+See [Quick Fix Guide](QUICK_FIX_UBUNTU.md) for detailed troubleshooting.
+
+---
+
 ## Common Issues
 
 ### Issue 1: "python3-dev not found" or "Python.h not found"
@@ -267,7 +338,29 @@ cmake -DPYTHON_EXECUTABLE=/usr/bin/python3 \
       ...
 ```
 
-### Issue 6: Ninja build system not found
+### Issue 6: GLIBCXX_3.4.32 not found (conda/miniconda users)
+
+**Error:**
+```python
+ImportError: /home/user/miniconda3/lib/libstdc++.so.6: version `GLIBCXX_3.4.32' not found
+```
+
+**Root Cause:** Using conda/miniconda Python with packages that require newer libstdc++.
+
+**Solution:**
+```bash
+# Best solution: Recreate venv with system Python
+./scripts/create_system_venv.sh
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Or: Set library path before running
+source scripts/setup_ubuntu_environment.sh
+```
+
+See [Special Considerations for conda/miniconda Users](#special-considerations-for-condaminiconda-users) above.
+
+### Issue 7: Ninja build system not found
 
 **Error:**
 ```
@@ -283,7 +376,7 @@ cmake -DCMAKE_BUILD_TYPE=Release ...  # (without -G Ninja)
 make -j$(nproc)
 ```
 
-### Issue 7: Out of memory during build
+### Issue 8: Out of memory during build
 
 **Error:**
 ```
